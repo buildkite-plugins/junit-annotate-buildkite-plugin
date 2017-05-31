@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -euo pipefail
+
+junits_dir=$(mktemp -d -p "$(pwd)" "junits-tmp.XXXXXXXXXX")
+
+function cleanup {
+  rm -rf "${junits_dir}"
+}
+
+trap cleanup EXIT
+
+echo "--- :junit: Download the junits"
+
+buildkite-agent artifact download "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS}" junits_dir
+
+echo "--- :junit: Processing the junits"
+
+docker run \
+  --rm \
+  -v "$(pwd)/src:/usr/src/app" \
+  -v "${junits_dir}:/junits" \
+  ruby:2.4 /usr/src/app/run.sh > "${junits_dir}/annotation.md"
+
+cat "${junits_dir}/annotation.md"
+
+echo "--- :buildkite: Creating annotation"
+
+buildkite-agent annotate --context junit --style error < "${junits_dir}/annotation.md"
