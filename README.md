@@ -1,6 +1,6 @@
 # JUnit Annotate Buildkite Plugin
 
-A [Buildkite](https://buildkite.com/) plugin that creates a summary of build failures as a build annotation, by parsing JUnit XML test report artifacts from previous jobs.
+A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) that parses junit.xml artifacts (generated across any number of parallel steps) and creates a [build annotation](https://buildkite.com/docs/agent/v3/cli-annotate) listing the individual tests that failed.
 
 ## Example
 
