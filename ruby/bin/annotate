@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+
+require 'rexml/document'
+
+# Reads a list of junit files and returns a nice Buildkite build annotation on
+# STDOUT that summarizes any failures.
+
+junits_dir = ARGV[0]
+abort("Usage: annotate <junits-dir>") unless junits_dir
+abort("#{junits_dir} does not exist") unless Dir.exist?(junits_dir)
+
+job_pattern = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN']
+job_pattern = '-(.*).xml' if !job_pattern || job_pattern.empty?
+
+class Failure < Struct.new(:name, :classname, :body, :job); end
+
+junit_report_files = Dir.glob(File.join(junits_dir, "*"))
+all_failures = []
+
+junit_report_files.each do |file|
+  STDERR.puts "Parsing #{file.sub(junits_dir, '')}"
+  job = File.basename(file)[/#{job_pattern}/, 1]
+  xml = File.read(file)
+  doc = REXML::Document.new(xml)
+
+  doc.elements.each('*/testcase') do |testcase|
+    name = testcase.attributes['name'].to_s
+    classname = testcase.attributes['classname'].to_s
+    testcase.elements.each("failure") do |failure|
+      all_failures << Failure.new(name, classname, failure.text.chomp.strip, job)
+    end
+  end
+end
+
+STDERR.puts "--- ❓ Checking failures"
+
+if all_failures.empty?
+  STDERR.puts "There were no failures 🙌"
+  exit 0
+else
+  STDERR.puts "There are #{all_failures.length} failures 😭"
+end
+
+STDERR.puts "--- ✍️ Preparing annotation"
+
+puts "There were #{all_failures.length} failures:\n\n"
+
+all_failures.each do |failure|
+  puts "<details>"
+  puts "<summary><code>#{failure.name} in #{failure.classname}</code></summary>\n\n"
+  puts "<code><pre>#{failure.body}</pre></code>\n\n"
+  if failure.job
+    puts "in <a href=\"##{failure.job}\">Job ##{failure.job}</a>"
+  end
+  puts "</details>"
+  puts "" unless failure == all_failures.last
+end

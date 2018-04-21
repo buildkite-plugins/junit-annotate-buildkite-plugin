@@ -14,7 +14,7 @@ steps:
   - wait: ~
     continue_on_failure: true
   - plugins:
-      junit-annotate#v0.0.1:
+      junit-annotate#v1.0.0:
         artifacts: tmp/junit-*.xml
 ```
 
@@ -25,6 +25,30 @@ steps:
 The artifact glob path to find the JUnit XML files.
 
 Example: `tmp/junit-*.xml`
+
+### `job-uuid-file-pattern` (optional)
+
+The regular expression (with capture group) that matches the job UUID in the junit file names. This is used to create the job links in the annotation.
+
+To use this, configure your test reporter to embed the `$BUILDKITE_JOB_UUID` environment variable into your junit file names. For example `"junit-buildkite-job-$BUILDKITE_JOB_UUID.xml"`.
+
+Default: `-(.*).xml`
+
+## Developing
+
+To test the junit parser (in Ruby) and plugin hooks (in Bash):
+
+```bash
+docker-compose run --rm plugin &&
+docker-compose run --rm ruby
+```
+
+To test the Ruby parser locally:
+
+```bash
+cd ruby
+rake
+```
 
 ## License
 

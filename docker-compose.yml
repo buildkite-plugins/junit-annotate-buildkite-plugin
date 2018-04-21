@@ -1,6 +1,14 @@
 version: '2'
 services:
-  tests:
+  plugin:
     image: buildkite/plugin-tester
     volumes:
       - ".:/plugin"
+    depends_on:
+      - ruby
+  ruby:
+    image: ruby:2.5-alpine
+    command: rake
+    working_dir: /src
+    volumes:
+      - "./ruby:/src"
