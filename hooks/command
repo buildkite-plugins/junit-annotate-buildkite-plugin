@@ -35,6 +35,8 @@ docker \
 
 cat "$annotation_path"
 
+buildkite-agent artifact upload "$annotation_path"
+
 if ! grep -q "There were no failures" "$annotation_path"; then
   echo "--- :buildkite: Creating annotation"
   # shellcheck disable=SC2002
