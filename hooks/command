@@ -2,28 +2,41 @@
 
 set -euo pipefail
 
-junits_dir=$(mktemp -d -p "$(pwd)" "junits-tmp.XXXXXXXXXX")
+PLUGIN_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)/.."
+
+echo "--- :junit: Download the junits"
+
+artifacts_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX")"
+annotation_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-annotation-tmp.XXXXXXXXXX")"
+annotation_path="${annotation_dir}/annotation.md"
 
 function cleanup {
-  rm -rf "${junits_dir}"
+  rm -rf "${artifacts_dir}"
+  rm -rf "${annotation_dir}"
 }
 
 trap cleanup EXIT
 
-echo "--- :junit: Download the junits"
-
-buildkite-agent artifact download "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS}" junits_dir
+buildkite-agent artifact download \
+  "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS}" \
+  "$artifacts_dir"
 
 echo "--- :junit: Processing the junits"
 
-docker run \
-  --rm \
-  -v "$(pwd)/src:/usr/src/app" \
-  -v "${junits_dir}:/junits" \
-  ruby:2.4 /usr/src/app/run.sh > "${junits_dir}/annotation.md"
+docker \
+  --log-level "error" \
+  run \
+    --rm \
+    --volume "$artifacts_dir:/junits" \
+    --volume "$PLUGIN_DIR/ruby:/src" \
+    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}" \
+    ruby:2.5-alpine /src/bin/annotate /junits \
+      > "$annotation_path"
 
-cat "${junits_dir}/annotation.md"
+cat "$annotation_path"
 
-echo "--- :buildkite: Creating annotation"
-
-buildkite-agent annotate --context junit --style error < "${junits_dir}/annotation.md"
+if grep -q "<details>" "$annotation_path"; then
+  echo "--- :buildkite: Creating annotation"
+  # shellcheck disable=SC2002
+  cat "$annotation_path" | buildkite-agent annotate --context junit --style error
+fi

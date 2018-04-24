@@ -1,7 +1,0 @@
-{
-  "name": "junit-annotate",
-  "description": "Annotates your build using JUnit XML reports",
-  "author": "@buildkite",
-  "public": true,
-  "requirements": ["docker"]
-}
