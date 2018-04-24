@@ -1,0 +1,14 @@
+name: junit-annotate
+description: Annotates your build using JUnit XML reports
+author: github.com/buildkite
+requirements:
+  - docker
+schema:
+  properties:
+    artifacts:
+      type: string
+    job-uuid-file-pattern:
+      type: string
+  required:
+    - artifacts
+  additionalProperties: false
