@@ -1,0 +1,8 @@
+properties:
+  artifacts:
+    type: string
+  job-uuid-file-pattern:
+    type: string
+required:
+  - artifacts
+additionalProperties: false
