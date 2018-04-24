@@ -7,7 +7,6 @@ steps:
     plugins:
       docker-compose#v2.0.0:
         run: ruby
-          - label: ":ruby: Ruby"
   - label: "✨ Lint"
     plugins:
       plugin-linter#v1.0.0: ~
