@@ -14,10 +14,12 @@ job_pattern = '-(.*).xml' if !job_pattern || job_pattern.empty?
 
 class Failure < Struct.new(:name, :classname, :body, :job); end
 
-junit_report_files = Dir.glob(File.join(junits_dir, "*"))
+junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"))
 all_failures = []
 
 junit_report_files.each do |file|
+  next if File.directory?(file)
+
   STDERR.puts "Parsing #{file.sub(junits_dir, '')}"
   job = File.basename(file)[/#{job_pattern}/, 1]
   xml = File.read(file)

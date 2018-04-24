@@ -94,4 +94,53 @@ describe "Junit annotate plugin parser" do
 
     assert_equal 0, status.exitstatus
   end
+
+  it "handles failures across multiple files in sub dirs" do
+    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/tests-in-sub-dirs/")
+
+    assert_equal <<~OUTPUT, output
+      Parsing sub-dir/junit-1.xml
+      Parsing sub-dir/junit-2.xml
+      --- ❓ Checking failures
+      There are 2 failures 😭
+      --- ✍️ Preparing annotation
+      There were 2 failures:
+      
+      <details>
+      <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>
+      
+      <code><pre>Failure/Error: expect(account.maximum_jobs_added_by_pipeline_changer).to eql(250)
+      
+        expected: 250
+             got: 500
+      
+        (compared using eql?)
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
+      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
+      ./spec/support/log.rb:17:in `run'
+      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</pre></code>
+      
+      in <a href="#1">Job #1</a>
+      </details>
+      
+      <details>
+      <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 700 if the account is XYZ in spec.models.account_spec</code></summary>
+      
+      <code><pre>Failure/Error: expect(account.maximum_jobs_added_by_pipeline_changer).to eql(250)
+      
+        expected: 700
+             got: 500
+      
+        (compared using eql?)
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
+      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
+      ./spec/support/log.rb:17:in `run'
+      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</pre></code>
+      
+      in <a href="#2">Job #2</a>
+      </details>
+    OUTPUT
+
+    assert_equal 0, status.exitstatus
+  end
 end

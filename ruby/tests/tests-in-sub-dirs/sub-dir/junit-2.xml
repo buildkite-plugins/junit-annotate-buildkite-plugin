@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="rspec" tests="1" skipped="0" failures="1" errors="0" time="49.290713" timestamp="2018-04-18T23:29:42+00:00" hostname="626d214475e4">
+  <testcase classname="spec.models.account_spec" name="Account#maximum_jobs_added_by_pipeline_changer returns 700 if the account is XYZ" file="./spec/models/account_spec.rb" time="0.967127">
+    <failure message=" expected: 700 got: 500 (compared using eql?) " type="RSpec::Expectations::ExpectationNotMetError">Failure/Error: expect(account.maximum_jobs_added_by_pipeline_changer).to eql(250)
+
+  expected: 700
+       got: 500
+
+  (compared using eql?)
+./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&apos;
+./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&apos;
+./spec/support/log.rb:17:in `run&apos;
+./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&apos;</failure>
+  </testcase>
+</testsuite>
