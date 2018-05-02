@@ -12,10 +12,11 @@ abort("#{junits_dir} does not exist") unless Dir.exist?(junits_dir)
 job_pattern = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN']
 job_pattern = '-(.*).xml' if !job_pattern || job_pattern.empty?
 
-class Failure < Struct.new(:name, :classname, :body, :job); end
+class Failure < Struct.new(:name, :classname, :body, :job, :type)
+end
 
 junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"))
-all_failures = []
+failures = []
 
 junit_report_files.each do |file|
   next if File.directory?(file)
@@ -29,31 +30,40 @@ junit_report_files.each do |file|
     name = testcase.attributes['name'].to_s
     classname = testcase.attributes['classname'].to_s
     testcase.elements.each("failure") do |failure|
-      all_failures << Failure.new(name, classname, failure.text.chomp.strip, job)
+      failures << Failure.new(name, classname, failure.text, job, :failure)
+    end
+    testcase.elements.each("error") do |error|
+      failures << Failure.new(name, classname, error.text, job, :error)
     end
   end
 end
 
 STDERR.puts "--- ❓ Checking failures"
 
-if all_failures.empty?
-  STDERR.puts "There were no failures 🙌"
+if failures.empty?
+  STDERR.puts "There were no failures/errors 🙌"
   exit 0
 else
-  STDERR.puts "There are #{all_failures.length} failures 😭"
+  STDERR.puts "There #{failures.length == 1 ? "is 1 failure/error" : "are #{failures.length} failures/errors" } 😭"
 end
 
 STDERR.puts "--- ✍️ Preparing annotation"
 
-puts "There were #{all_failures.length} failures:\n\n"
+failures_count = failures.select {|f| f.type == :failure }.length
+errors_count = failures.select {|f| f.type == :error }.length
 
-all_failures.each do |failure|
+puts [
+  failures_count == 0 ? nil : (failures_count == 1 ? "1 failure" : "#{failures_count} failures"),
+  errors_count === 0 ? nil : (errors_count == 1 ? "1 error" : "#{errors_count} errors"),
+].compact.join(" and ") + ":\n\n"
+
+failures.each do |failure|
   puts "<details>"
   puts "<summary><code>#{failure.name} in #{failure.classname}</code></summary>\n\n"
-  puts "<code><pre>#{failure.body}</pre></code>\n\n"
+  puts "<code><pre>#{failure.body.chomp.strip}</pre></code>\n\n"
   if failure.job
     puts "in <a href=\"##{failure.job}\">Job ##{failure.job}</a>"
   end
   puts "</details>"
-  puts "" unless failure == all_failures.last
+  puts "" unless failure == failures.last
 end
