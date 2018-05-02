@@ -30,7 +30,7 @@ Example: `tmp/junit-*.xml`
 
 The regular expression (with capture group) that matches the job UUID in the junit file names. This is used to create the job links in the annotation.
 
-To use this, configure your test reporter to embed the `$BUILDKITE_JOB_UUID` environment variable into your junit file names. For example `"junit-buildkite-job-$BUILDKITE_JOB_UUID.xml"`.
+To use this, configure your test reporter to embed the `$BUILDKITE_JOB_ID` environment variable into your junit file names. For example `"junit-buildkite-job-$BUILDKITE_JOB_ID.xml"`.
 
 Default: `-(.*).xml`
 
