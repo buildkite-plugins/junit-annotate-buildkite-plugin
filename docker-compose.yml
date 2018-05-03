@@ -1,13 +1,13 @@
 version: '2'
 services:
   plugin:
-    image: buildkite/plugin-tester
+    image: buildkite/plugin-tester:latest@sha256:3353aad77c88b7cd3ed59423a1bc72c56e034a00623378c36c443f6dba1b3722
     volumes:
       - ".:/plugin"
     depends_on:
       - ruby
   ruby:
-    image: ruby:2.5-alpine
+    image: ruby:2.5-alpine@sha256:f1dbca0f5dbc926eccc000967c6b09a441d1808f36b15fde4ae621124c2d3bb4
     command: rake
     working_dir: /src
     volumes:
