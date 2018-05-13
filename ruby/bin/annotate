@@ -18,7 +18,7 @@ end
 junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"))
 failures = []
 
-junit_report_files.each do |file|
+junit_report_files.sort.each do |file|
   next if File.directory?(file)
 
   STDERR.puts "Parsing #{file.sub(junits_dir, '')}"
