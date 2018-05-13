@@ -26,7 +26,7 @@ junit_report_files.each do |file|
   xml = File.read(file)
   doc = REXML::Document.new(xml)
 
-  doc.elements.each('*/testcase') do |testcase|
+  REXML::XPath.each(doc, '//testsuite//testcase') do |testcase|
     name = testcase.attributes['name'].to_s
     classname = testcase.attributes['classname'].to_s
     testcase.elements.each("failure") do |failure|
