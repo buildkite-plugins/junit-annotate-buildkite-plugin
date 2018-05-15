@@ -1,4 +1,4 @@
-name: junit-annotate
+name: Junit Annotate
 description: Annotates your build using JUnit XML reports
 author: https://github.com/buildkite
 requirements:
