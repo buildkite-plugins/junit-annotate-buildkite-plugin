@@ -10,7 +10,7 @@ steps:
   - label: "✨ Lint"
     plugins:
       plugin-linter#v2.0.0:
-        name: junit-annotate
+        id: junit-annotate
   - label: ":bash: Shellcheck"
     plugins:
       shellcheck#v1.0.1:
