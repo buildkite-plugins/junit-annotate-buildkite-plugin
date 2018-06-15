@@ -60,7 +60,9 @@ puts [
 failures.each do |failure|
   puts "<details>"
   puts "<summary><code>#{failure.name} in #{failure.classname}</code></summary>\n\n"
-  puts "<code><pre>#{failure.body.chomp.strip}</pre></code>\n\n"
+  if failure.body
+    puts "<code><pre>#{failure.body.chomp.strip}</pre></code>\n\n"
+  end
   if failure.job
     puts "in <a href=\"##{failure.job}\">Job ##{failure.job}</a>"
   end

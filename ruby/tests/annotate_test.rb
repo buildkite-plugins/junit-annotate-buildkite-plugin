@@ -298,4 +298,23 @@ describe "Junit annotate plugin parser" do
 
     assert_equal 0, status.exitstatus
   end
+
+  it "handles empty failure bodies" do
+    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/empty-failure-body/")
+
+    assert_equal <<~OUTPUT, output
+      Parsing junit.xml
+      --- ❓ Checking failures
+      There is 1 failure/error 😭
+      --- ✍️ Preparing annotation
+      1 failure:
+
+      <details>
+      <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>
+
+      </details>
+    OUTPUT
+
+    assert_equal 0, status.exitstatus
+  end
 end
