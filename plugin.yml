@@ -9,6 +9,8 @@ configuration:
       type: string
     job-uuid-file-pattern:
       type: string
+    failure-format:
+      type: string
   required:
     - artifacts
   additionalProperties: false
