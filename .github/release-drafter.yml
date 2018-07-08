@@ -1,0 +1,16 @@
+# Config for https://github.com/apps/release-drafter
+template: |
+  ## TODO: Added/Removed/Fixed/Changed
+
+  $CHANGES
+
+  ## Upgrading
+
+  To upgrade, update your `pipeline.yml` files:
+
+  ```diff
+  steps:
+    - plugins:
+  -     junit-annotate#$PREVIOUS_TAG:
+  +     junit-annotate#TODO:
+  ```
