@@ -34,6 +34,14 @@ To use this, configure your test reporter to embed the `$BUILDKITE_JOB_ID` envir
 
 Default: `-(.*).xml`
 
+### `failure-format` (optional)
+
+This setting controls the format of your failed test in the main annotation summary.
+
+There are two options for this:
+* `classname` (default) -- will display:  `MyClass::UnderTest text of the failed expectation in path.to.my_class.under_test`
+* `file` -- will display:  `MyClass::UnderTest text of the failed expectation in path/to/my_class/under_test.file_ext`
+
 ## Developing
 
 To test the junit parser (in Ruby) and plugin hooks (in Bash):
