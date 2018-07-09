@@ -27,20 +27,22 @@ The artifact glob path to find the JUnit XML files.
 Example: `tmp/junit-*.xml`
 
 ### `job-uuid-file-pattern` (optional)
+Default: `-(.*).xml`
 
 The regular expression (with capture group) that matches the job UUID in the junit file names. This is used to create the job links in the annotation.
 
 To use this, configure your test reporter to embed the `$BUILDKITE_JOB_ID` environment variable into your junit file names. For example `"junit-buildkite-job-$BUILDKITE_JOB_ID.xml"`.
 
-Default: `-(.*).xml`
-
 ### `failure-format` (optional)
+Default: `classname`
 
 This setting controls the format of your failed test in the main annotation summary.
 
 There are two options for this:
-* `classname` (default) -- will display:  `MyClass::UnderTest text of the failed expectation in path.to.my_class.under_test`
-* `file` -- will display:  `MyClass::UnderTest text of the failed expectation in path/to/my_class/under_test.file_ext`
+* `classname`
+  * displays: `MyClass::UnderTest text of the failed expectation in path.to.my_class.under_test`
+* `file`
+  * displays: `MyClass::UnderTest text of the failed expectation in path/to/my_class/under_test.file_ext`
 
 ## Developing
 

@@ -14,6 +14,9 @@ job_pattern = '-(.*).xml' if !job_pattern || job_pattern.empty?
 
 failure_format = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT']
 failure_format = 'classname' if !failure_format || failure_format.empty?
+if !%w(classname file).include?(failure_format)
+  raise ArgumentError.new("Invalid failure-format #{failure_format} provided -- leave this setting blank or specify `file` or `classname`")
+end
 
 class Failure < Struct.new(:name, :failed_test, :body, :job, :type)
 end
