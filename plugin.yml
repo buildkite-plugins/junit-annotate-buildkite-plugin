@@ -11,6 +11,9 @@ configuration:
       type: string
     failure-format:
       type: string
+      enum:
+        - classname
+        - file
   required:
     - artifacts
   additionalProperties: false
