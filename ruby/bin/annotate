@@ -12,7 +12,15 @@ abort("#{junits_dir} does not exist") unless Dir.exist?(junits_dir)
 job_pattern = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN']
 job_pattern = '-(.*).xml' if !job_pattern || job_pattern.empty?
 
-class Failure < Struct.new(:name, :classname, :body, :job, :type)
+failure_format = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT']
+failure_format = 'classname' if !failure_format || failure_format.empty?
+
+# TODO -- remove this validation once https://github.com/buildkite/agent/pull/748 is merged
+if !%w(classname file).include?(failure_format)
+  abort("Invalid failure-format #{failure_format} provided -- leave this setting blank or specify `file` or `classname`")
+end
+
+class Failure < Struct.new(:name, :failed_test, :body, :job, :type)
 end
 
 junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"))
@@ -28,12 +36,12 @@ junit_report_files.sort.each do |file|
 
   REXML::XPath.each(doc, '//testsuite//testcase') do |testcase|
     name = testcase.attributes['name'].to_s
-    classname = testcase.attributes['classname'].to_s
+    failed_test = testcase.attributes[failure_format].to_s
     testcase.elements.each("failure") do |failure|
-      failures << Failure.new(name, classname, failure.text, job, :failure)
+      failures << Failure.new(name, failed_test, failure.text, job, :failure)
     end
     testcase.elements.each("error") do |error|
-      failures << Failure.new(name, classname, error.text, job, :error)
+      failures << Failure.new(name, failed_test, error.text, job, :error)
     end
   end
 end
@@ -59,7 +67,7 @@ puts [
 
 failures.each do |failure|
   puts "<details>"
-  puts "<summary><code>#{failure.name} in #{failure.classname}</code></summary>\n\n"
+  puts "<summary><code>#{failure.name} in #{failure.failed_test}</code></summary>\n\n"
   if failure.body
     puts "<code><pre>#{failure.body.chomp.strip}</pre></code>\n\n"
   end
