@@ -20,7 +20,7 @@ load "$BATS_PATH/load.bash"
   stub buildkite-agent "artifact download junits/*.xml /plugin/tests/tmp//plugin/junit-artifacts : echo Downloaded artifacts" \
                        "annotate --context junit --style error : echo Annotation added"
 
-  stub docker "--log-level error run --rm --volume /plugin/tests/tmp//plugin/junit-artifacts:/junits --volume /plugin/hooks/../ruby:/src --env 'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}' --env 'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_OUTPUT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_OUTPUT:-}' ruby:2.5-alpine /src/bin/annotate /junits : echo '<details>Failure</details>'"
+  stub docker "--log-level error run --rm --volume /plugin/tests/tmp//plugin/junit-artifacts:/junits --volume /plugin/hooks/../ruby:/src --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN= --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_OUTPUT= ruby:2.5-alpine /src/bin/annotate /junits : echo '<details>Failure</details>'"
 
   run "$PWD/hooks/command"
 
@@ -48,7 +48,7 @@ load "$BATS_PATH/load.bash"
   stub buildkite-agent "artifact download junits/*.xml /plugin/tests/tmp//plugin/junit-artifacts : echo Downloaded artifacts" \
                        "annotate --context junit --style error : echo Annotation added"
 
-  stub docker "--log-level error run --rm --volume /plugin/tests/tmp//plugin/junit-artifacts:/junits --volume /plugin/hooks/../ruby:/src --env 'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}' --env 'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_OUTPUT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_OUTPUT:-}' ruby:2.5-alpine /src/bin/annotate /junits : echo '<details>Failure</details>'"
+  stub docker "--log-level error run --rm --volume /plugin/tests/tmp//plugin/junit-artifacts:/junits --volume /plugin/hooks/../ruby:/src --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN='custom_(*)_pattern.xml' --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_OUTPUT='file' ruby:2.5-alpine /src/bin/annotate /junits : echo '<details>Failure</details>'"
 
   run "$PWD/hooks/command"
 
@@ -73,7 +73,7 @@ load "$BATS_PATH/load.bash"
 
   stub buildkite-agent "artifact download junits/*.xml /plugin/tests/tmp//plugin/junit-artifacts : echo Downloaded artifacts"
 
-  stub docker "--log-level error run --rm --volume /plugin/tests/tmp//plugin/junit-artifacts:/junits --volume /plugin/hooks/../ruby:/src --env 'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}' --env 'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_OUTPUT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_OUTPUT:-}' ruby:2.5-alpine /src/bin/annotate /junits : echo No test errors"
+  stub docker "--log-level error run --rm --volume /plugin/tests/tmp//plugin/junit-artifacts:/junits --volume /plugin/hooks/../ruby:/src --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN= --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_OUTPUT= ruby:2.5-alpine /src/bin/annotate /junits : echo No test errors"
 
   run "$PWD/hooks/command"
 
@@ -82,4 +82,12 @@ load "$BATS_PATH/load.bash"
   unstub mktemp
   unstub buildkite-agent
   unstub docker
+}
+
+@test "errors without the 'artifacts' property set" {
+  run "$PWD/hooks/command"
+
+  assert_failure
+
+  assert_output --partial "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS: unbound variable"
 }
