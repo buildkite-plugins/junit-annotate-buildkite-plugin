@@ -60,6 +60,16 @@ cd ruby
 rake
 ```
 
+To test your plugin in your builds prior to opening a pull request, you can refer to your fork and SHA from a branch in your `pipeline.yml`.
+
+```
+steps:
+  - label: Annotate
+    plugins:
+      YourGithubHandle/junit-annotate#sha:
+        ...
+```
+
 ## License
 
 MIT (see [LICENSE](LICENSE))
