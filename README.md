@@ -66,8 +66,8 @@ To test your plugin in your builds prior to opening a pull request, you can refe
 steps:
   - label: Annotate
     plugins:
-      YourGithubHandle/junit-annotate#v1.4.1:
-        ...
+      - YourGithubHandle/junit-annotate#v1.4.1:
+          ...
 ```
 
 ## License
