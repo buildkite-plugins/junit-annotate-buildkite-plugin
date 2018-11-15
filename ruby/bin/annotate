@@ -15,11 +15,6 @@ job_pattern = '-(.*).xml' if !job_pattern || job_pattern.empty?
 failure_format = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT']
 failure_format = 'classname' if !failure_format || failure_format.empty?
 
-# TODO -- remove this validation once https://github.com/buildkite/agent/pull/748 is merged
-if !%w(classname file).include?(failure_format)
-  abort("Invalid failure-format #{failure_format} provided -- leave this setting blank or specify `file` or `classname`")
-end
-
 class Failure < Struct.new(:name, :failed_test, :body, :job, :type)
 end
 
