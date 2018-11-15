@@ -44,6 +44,13 @@ There are two options for this:
 * `file`
   * displays: `MyClass::UnderTest text of the failed expectation in path/to/my_class/under_test.file_ext`
 
+### `fail-build-on-error` (optional)  
+Default: `false`
+
+If this setting is true and any errors are found in the JUnit XML files during
+parsing, the annotation step will exit with a non-zero value, which should cause 
+the build to fail.
+
 ## Developing
 
 To test the junit parser (in Ruby) and plugin hooks (in Bash):
