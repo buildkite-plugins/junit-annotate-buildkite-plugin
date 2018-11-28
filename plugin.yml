@@ -14,6 +14,8 @@ configuration:
       enum:
         - classname
         - file
+    fail-build-on-error:
+      type: boolean
   required:
     - artifacts
   additionalProperties: false
