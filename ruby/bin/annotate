@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'rexml/document'
-require "rexml/element"
+require 'rexml/element'
 
 # Adapted from https://stackoverflow.com/a/25888239/759019
 class REXML::Element
