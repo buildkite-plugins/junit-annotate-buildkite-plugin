@@ -1,4 +1,6 @@
 # Config for https://github.com/apps/release-drafter
+name-template: v$NEXT_MINOR_VERSION (🐣 Code Name)
+tag-template: v$NEXT_MINOR_VERSION
 template: |
   ## TODO: Added/Removed/Fixed/Changed
 
