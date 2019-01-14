@@ -299,11 +299,6 @@ describe "Junit annotate plugin parser" do
     assert_equal 0, status.exitstatus
   end
 
-  it "raises an error when an invalid failure-format is provided" do
-    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=kittens", "#{__dir__}/../bin/annotate", "#{__dir__}/test-failure-and-error/")
-    assert_equal false, status.success?
-  end
-
   it "handles failures across multiple files in sub dirs" do
     output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/tests-in-sub-dirs/")
 
