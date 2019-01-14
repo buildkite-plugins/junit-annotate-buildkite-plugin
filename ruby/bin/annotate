@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'rexml/document'
+require 'rexml/element'
 
 # Reads a list of junit files and returns a nice Buildkite build annotation on
 # STDOUT that summarizes any failures.
@@ -21,6 +22,16 @@ end
 junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"))
 failures = []
 
+def text_content(element)
+  # Handle mulptiple CDATA/text children elements
+  text = element.texts().map(&:value).join.strip
+  if text.empty?
+    nil
+  else
+    text
+  end
+end
+
 junit_report_files.sort.each do |file|
   next if File.directory?(file)
 
@@ -33,10 +44,10 @@ junit_report_files.sort.each do |file|
     name = testcase.attributes['name'].to_s
     failed_test = testcase.attributes[failure_format].to_s
     testcase.elements.each("failure") do |failure|
-      failures << Failure.new(name, failed_test, failure.text, job, :failure)
+      failures << Failure.new(name, failed_test, text_content(failure), job, :failure)
     end
     testcase.elements.each("error") do |error|
-      failures << Failure.new(name, failed_test, error.text, job, :error)
+      failures << Failure.new(name, failed_test, text_content(error), job, :error)
     end
   end
 end
