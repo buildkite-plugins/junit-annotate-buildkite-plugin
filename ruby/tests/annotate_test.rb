@@ -406,4 +406,26 @@ describe "Junit annotate plugin parser" do
 
     assert_equal 0, status.exitstatus
   end
+
+  it "handles cdata formatted XML files" do
+    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/failure-with-cdata/")
+
+    assert_equal <<~OUTPUT, output
+      Parsing junit.xml
+      --- ❓ Checking failures
+      There is 1 failure/error 😭
+      --- ✍️ Preparing annotation
+      1 error:
+
+      <details>
+      <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>
+
+      <code><pre>First line of failure output
+            Second line of failure output</pre></code>
+
+      </details>
+    OUTPUT
+
+    assert_equal 0, status.exitstatus
+  end
 end
