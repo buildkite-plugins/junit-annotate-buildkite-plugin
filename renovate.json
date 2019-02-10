@@ -2,9 +2,7 @@
   "extends": [
     "config:base"
   ],
-  "docker-compose": {
-    "digest": {
-      "enabled": false
-    }
+  "bundler": {
+    "enabled": true
   }
 }
