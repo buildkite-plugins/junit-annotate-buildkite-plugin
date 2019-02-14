@@ -10,6 +10,7 @@ describe "Junit annotate plugin parser" do
       Parsing junit-2.xml
       Parsing junit-3.xml
       --- ❓ Checking failures
+      8 testcases found
       There were no failures/errors 🙌
     OUTPUT
 
@@ -24,6 +25,7 @@ describe "Junit annotate plugin parser" do
       Parsing junit-2.xml
       Parsing junit-3.xml
       --- ❓ Checking failures
+      6 testcases found
       There are 4 failures/errors 😭
       --- ✍️ Preparing annotation
       4 failures:
@@ -108,6 +110,7 @@ describe "Junit annotate plugin parser" do
       Parsing junit-2.xml
       Parsing junit-3.xml
       --- ❓ Checking failures
+      6 testcases found
       There are 4 failures/errors 😭
       --- ✍️ Preparing annotation
       2 failures and 2 errors:
@@ -190,6 +193,7 @@ describe "Junit annotate plugin parser" do
     assert_equal <<~OUTPUT, output
       Parsing junit-123-456-custom-pattern.xml
       --- ❓ Checking failures
+      2 testcases found
       There is 1 failure/error 😭
       --- ✍️ Preparing annotation
       1 failure:
@@ -223,6 +227,7 @@ describe "Junit annotate plugin parser" do
       Parsing junit-2.xml
       Parsing junit-3.xml
       --- ❓ Checking failures
+      6 testcases found
       There are 4 failures/errors 😭
       --- ✍️ Preparing annotation
       2 failures and 2 errors:
@@ -307,6 +312,7 @@ describe "Junit annotate plugin parser" do
       Parsing sub-dir/junit-2.xml
       Parsing sub-dir/junit-3.xml
       --- ❓ Checking failures
+      6 testcases found
       There are 4 failures/errors 😭
       --- ✍️ Preparing annotation
       4 failures:
@@ -389,6 +395,7 @@ describe "Junit annotate plugin parser" do
     assert_equal <<~OUTPUT, output
       Parsing junit.xml
       --- ❓ Checking failures
+      2 testcases found
       There is 1 failure/error 😭
       --- ✍️ Preparing annotation
       1 failure:
@@ -408,6 +415,7 @@ describe "Junit annotate plugin parser" do
     assert_equal <<~OUTPUT, output
       Parsing junit.xml
       --- ❓ Checking failures
+      2 testcases found
       There is 1 failure/error 😭
       --- ✍️ Preparing annotation
       1 error:
