@@ -20,6 +20,7 @@ class Failure < Struct.new(:name, :failed_test, :body, :job, :type)
 end
 
 junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"))
+testcases = 0
 failures = []
 
 def text_content(element)
@@ -41,6 +42,7 @@ junit_report_files.sort.each do |file|
   doc = REXML::Document.new(xml)
 
   REXML::XPath.each(doc, '//testsuite//testcase') do |testcase|
+    testcases += 1
     name = testcase.attributes['name'].to_s
     failed_test = testcase.attributes[failure_format].to_s
     testcase.elements.each("failure") do |failure|
@@ -53,6 +55,7 @@ junit_report_files.sort.each do |file|
 end
 
 STDERR.puts "--- ❓ Checking failures"
+STDERR.puts "#{testcases} testcases found"
 
 if failures.empty?
   STDERR.puts "There were no failures/errors 🙌"
