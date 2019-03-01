@@ -6,6 +6,8 @@ require 'rexml/element'
 # Reads a list of junit files and returns a nice Buildkite build annotation on
 # STDOUT that summarizes any failures.
 
+MAX_OUTPUT_SIZE = 1024 * 100
+TRUNCATION_MESSAGE = "Output truncated"
 junits_dir = ARGV[0]
 abort("Usage: annotate <junits-dir>") unless junits_dir
 abort("#{junits_dir} does not exist") unless Dir.exist?(junits_dir)
@@ -17,6 +19,25 @@ failure_format = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT']
 failure_format = 'classname' if !failure_format || failure_format.empty?
 
 class Failure < Struct.new(:name, :failed_test, :body, :job, :type)
+end
+
+class Output
+  def initialize
+    @buffer=""
+  end
+  def puts(message)
+    @buffer += "\n" unless @buffer.empty?
+    @buffer += message
+  end
+
+  def buffer
+    max_size = MAX_OUTPUT_SIZE - TRUNCATION_MESSAGE.bytesize
+    if @buffer.bytesize <= max_size
+      @buffer
+    else
+      @buffer[0..max_size] + TRUNCATION_MESSAGE
+    end
+  end
 end
 
 junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"))
@@ -65,24 +86,26 @@ else
 end
 
 STDERR.puts "--- ✍️ Preparing annotation"
-
+output = Output.new
 failures_count = failures.select {|f| f.type == :failure }.length
 errors_count = failures.select {|f| f.type == :error }.length
 
-puts [
+output.puts  [
   failures_count == 0 ? nil : (failures_count == 1 ? "1 failure" : "#{failures_count} failures"),
   errors_count === 0 ? nil : (errors_count == 1 ? "1 error" : "#{errors_count} errors"),
-].compact.join(" and ") + ":\n\n"
+].compact.join(" and ") + ":\n"
 
 failures.each do |failure|
-  puts "<details>"
-  puts "<summary><code>#{failure.name} in #{failure.failed_test}</code></summary>\n\n"
+  output.puts "<details>"
+  output.puts "<summary><code>#{failure.name} in #{failure.failed_test}</code></summary>\n"
   if failure.body
-    puts "<code><pre>#{failure.body.chomp.strip}</pre></code>\n\n"
+    output.puts "<code><pre>#{failure.body.chomp.strip}</pre></code>\n"
   end
   if failure.job
-    puts "in <a href=\"##{failure.job}\">Job ##{failure.job}</a>"
+    output.puts "in <a href=\"##{failure.job}\">Job ##{failure.job}</a>"
   end
-  puts "</details>"
-  puts "" unless failure == failures.last
+  output.puts "</details>"
+  output.puts "" unless failure == failures.last
 end
+
+STDERR.puts output.buffer

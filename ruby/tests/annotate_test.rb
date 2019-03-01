@@ -29,12 +29,12 @@ describe "Junit annotate plugin parser" do
       There are 4 failures/errors 😭
       --- ✍️ Preparing annotation
       4 failures:
-      
+
       <details>
       <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>
-      
+
       <code><pre>Failure/Error: expect(account.maximum_jobs_added_by_pipeline_changer).to eql(250)
-      
+
         expected: 250
              got: 500
       
@@ -431,4 +431,11 @@ describe "Junit annotate plugin parser" do
 
     assert_equal 0, status.exitstatus
   end
+
+  it "handles output that is too large to be to processed by the annotations API" do
+    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/huge-xml-files/")
+    assert_match "Output truncated", output
+    assert_equal 0, status.exitstatus
+  end
+
 end
