@@ -7,7 +7,6 @@ require 'rexml/element'
 # STDOUT that summarizes any failures.
 
 MAX_OUTPUT_SIZE = 1024 * 100
-TRUNCATION_MESSAGE = "Output truncated"
 junits_dir = ARGV[0]
 abort("Usage: annotate <junits-dir>") unless junits_dir
 abort("#{junits_dir} does not exist") unless Dir.exist?(junits_dir)
@@ -31,11 +30,10 @@ class Output
   end
 
   def buffer
-    max_size = MAX_OUTPUT_SIZE - TRUNCATION_MESSAGE.bytesize
-    if @buffer.bytesize <= max_size
+    if @buffer.bytesize <= MAX_OUTPUT_SIZE
       @buffer
     else
-      @buffer[0..max_size] + TRUNCATION_MESSAGE
+        STDERR.puts "The output was too long for BuildKite 😢"
     end
   end
 end

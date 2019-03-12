@@ -434,7 +434,15 @@ describe "Junit annotate plugin parser" do
 
   it "handles output that is too large to be to processed by the annotations API" do
     output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/huge-xml-files/")
-    assert_match "Output truncated", output
+    assert_equal <<~OUTPUT, output
+      Parsing junit-1.xml
+      --- ❓ Checking failures
+      1 testcases found
+      There is 1 failure/error 😭
+      --- ✍️ Preparing annotation
+      The output was too long for BuildKite 😢
+
+    OUTPUT
     assert_equal 0, status.exitstatus
   end
 
