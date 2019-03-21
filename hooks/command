@@ -3,6 +3,7 @@
 set -euo pipefail
 
 PLUGIN_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)/.."
+MAX_SIZE=100 # in KB
 
 echo "--- :junit: Download the junits"
 
@@ -13,6 +14,12 @@ annotation_path="${annotation_dir}/annotation.md"
 function cleanup {
   rm -rf "${artifacts_dir}"
   rm -rf "${annotation_dir}"
+}
+
+function check_size {
+  local size_in_kb
+  size_in_kb=$(du -k "${annotation_path}" | cut -f 1)
+  [ "${size_in_kb}" -lt "${MAX_SIZE}" ]
 }
 
 trap cleanup EXIT
@@ -37,6 +44,12 @@ docker \
 cat "$annotation_path"
 
 if grep -q "<details>" "$annotation_path"; then
+
+  if ! check_size; then
+      echo "--- :hurtrealbad: Sorry, annotation is too big to publish"
+      exit 1
+  fi
+
   echo "--- :buildkite: Creating annotation"
   # shellcheck disable=SC2002
   cat "$annotation_path" | buildkite-agent annotate --context junit --style error
