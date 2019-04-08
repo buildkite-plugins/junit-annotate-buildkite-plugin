@@ -53,7 +53,7 @@ the build to fail.
 
 ## Developing
 
-To test the junit parser (in Ruby) and plugin hooks (in Bash):
+To test the plugin hooks (in Bash) and the junit parser (in Ruby):
 
 ```bash
 docker-compose run --rm plugin &&
