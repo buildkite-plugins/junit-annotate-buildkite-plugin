@@ -53,7 +53,7 @@ the build to fail.
 
 ## Developing
 
-To test the junit parser (in Ruby) and plugin hooks (in Bash):
+To test the plugin hooks (in Bash) and the junit parser (in Ruby):
 
 ```bash
 docker-compose run --rm plugin &&
@@ -73,7 +73,7 @@ To test your plugin in your builds prior to opening a pull request, you can refe
 steps:
   - label: Annotate
     plugins:
-      - YourGithubHandle/junit-annotate#v1.5.1:
+      - YourGithubHandle/junit-annotate#v1.2.3:
           ...
 ```
 
