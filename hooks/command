@@ -46,8 +46,9 @@ cat "$annotation_path"
 if grep -q "<details>" "$annotation_path"; then
 
   if ! check_size; then
-      echo "--- :hurtrealbad: Sorry, annotation is too big to publish"
-      exit 1
+      echo "--- :warning: Failures too large to annotate"
+      echo "The failures are too large to create a build annotation. Please inspect the failed JUnit artifacts manually."
+      exit 0
   fi
 
   echo "--- :buildkite: Creating annotation"
