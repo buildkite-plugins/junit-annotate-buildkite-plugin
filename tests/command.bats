@@ -6,6 +6,7 @@ load "$BATS_PATH/load.bash"
 # export MKTEMP_STUB_DEBUG=/dev/tty
 # export BUILDKITE_AGENT_STUB_DEBUG=/dev/tty
 # export DOCKER_STUB_DEBUG=/dev/tty
+# export DU_STUB_DEBUG=/dev/tty
 
 @test "runs the annotator and creates the annotation" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
@@ -117,4 +118,33 @@ load "$BATS_PATH/load.bash"
   assert_failure
 
   assert_output --partial "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS: unbound variable"
+}
+
+@test "fails if the annotation is larger than " {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+
+  artifacts_tmp="tests/tmp/$PWD/junit-artifacts"
+  annotation_tmp="tests/tmp/$PWD/junit-annotation"
+
+  stub mktemp \
+    "-d junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX : mkdir -p $artifacts_tmp; echo $artifacts_tmp" \
+    "-d junit-annotate-plugin-annotation-tmp.XXXXXXXXXX : mkdir -p $annotation_tmp; echo $annotation_tmp"
+
+  # 1kb over the 100k size limit of annotations
+  stub du "-k /plugin/tests/tmp//plugin/junit-annotation/annotation.md : echo 101 /plugin/tests/tmp//plugin/junit-annotation/annotation.md"
+
+  stub buildkite-agent "artifact download junits/*.xml /plugin/tests/tmp//plugin/junit-artifacts : echo Downloaded artifacts"
+
+  stub docker "--log-level error run --rm --volume /plugin/tests/tmp//plugin/junit-artifacts:/junits --volume /plugin/hooks/../ruby:/src --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN= --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT= ruby:2.5-alpine /src/bin/annotate /junits : echo '<details>Failure</details>'"
+
+  run "$PWD/hooks/command"
+
+  assert_success
+
+  assert_output --partial "Failures too large to annotate"
+
+  unstub docker
+  unstub buildkite-agent
+  unstub du
+  unstub mktemp
 }
