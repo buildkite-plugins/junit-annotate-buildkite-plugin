@@ -2,6 +2,7 @@
 
 require 'rexml/document'
 require 'rexml/element'
+require 'cgi/util'
 
 # Reads a list of junit files and returns a nice Buildkite build annotation on
 # STDOUT that summarizes any failures.
@@ -78,7 +79,7 @@ failures.each do |failure|
   puts "<details>"
   puts "<summary><code>#{failure.name} in #{failure.failed_test}</code></summary>\n\n"
   if failure.body
-    puts "<pre><code>#{failure.body.chomp.strip}</code></pre>\n\n"
+    puts "<pre><code>#{CGI.escapeHTML(failure.body.chomp.strip)}</code></pre>\n\n"
   end
   if failure.job
     puts "in <a href=\"##{failure.job}\">Job ##{failure.job}</a>"
