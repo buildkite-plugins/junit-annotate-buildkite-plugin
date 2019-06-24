@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="rspec" tests="2" skipped="0" failures="0" errors="1" time="49.290713" timestamp="2018-04-18T23:29:42+00:00" hostname="626d214475e4">
+  <testcase classname="spec.models.account_spec" name="Account#maximum_jobs_added_by_pipeline_changer returns 500 if the account is ABC" file="./spec/models/account_spec.rb" time="0.020013"/>
+  <testcase classname="spec.models.account_spec" name="Account#maximum_jobs_added_by_pipeline_changer returns 250 by default" file="./spec/models/account_spec.rb" time="0.967127">
+    <failure type="RSpec::Expectations::ExpectationNotMetError"></failure>
+  </testcase>
+  <testcase classname="spec.models.account_spec" name="Account#maximum_jobs_added_by_pipeline_changer returns 100 by default" file="./spec/models/account_spec.rb" time="0.967127">
+    <error type="RSpec::Expectations::ExpectationNotMetError"></error>
+  </testcase>
+  <testcase classname="spec.models.account_spec" name="Account#maximum_jobs_added_by_pipeline_changer returns 50 by default" file="./spec/models/account_spec.rb" time="0.967127">
+    <error message="" type="RSpec::Expectations::ExpectationNotMetError"></error>
+  </testcase>
+</testsuite>
