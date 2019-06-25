@@ -16,7 +16,7 @@ job_pattern = '-(.*).xml' if !job_pattern || job_pattern.empty?
 failure_format = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT']
 failure_format = 'classname' if !failure_format || failure_format.empty?
 
-class Failure < Struct.new(:name, :failed_test, :body, :job, :type)
+class Failure < Struct.new(:name, :failed_test, :body, :job, :type, :message)
 end
 
 junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"))
@@ -33,6 +33,16 @@ def text_content(element)
   end
 end
 
+def message_content(element)
+  # Handle empty attributes
+  message = element.attributes['message'];
+  if message.nil? || message.empty?
+    nil
+  else
+    message.to_s
+  end
+end
+
 junit_report_files.sort.each do |file|
   next if File.directory?(file)
 
@@ -46,10 +56,10 @@ junit_report_files.sort.each do |file|
     name = testcase.attributes['name'].to_s
     failed_test = testcase.attributes[failure_format].to_s
     testcase.elements.each("failure") do |failure|
-      failures << Failure.new(name, failed_test, text_content(failure), job, :failure)
+      failures << Failure.new(name, failed_test, text_content(failure), job, :failure, message_content(failure))
     end
     testcase.elements.each("error") do |error|
-      failures << Failure.new(name, failed_test, text_content(error), job, :error)
+      failures << Failure.new(name, failed_test, text_content(error), job, :error, message_content(error))
     end
   end
 end
@@ -77,6 +87,9 @@ puts [
 failures.each do |failure|
   puts "<details>"
   puts "<summary><code>#{failure.name} in #{failure.failed_test}</code></summary>\n\n"
+  if failure.message
+    puts "<p>#{failure.message.chomp.strip}</p>\n\n"
+  end
   if failure.body
     puts "<pre><code>#{failure.body.chomp.strip}</code></pre>\n\n"
   end
