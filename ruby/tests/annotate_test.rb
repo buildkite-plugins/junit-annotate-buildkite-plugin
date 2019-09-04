@@ -41,10 +41,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#1">Job #1</a>
       </details>
@@ -60,10 +60,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#2">Job #2</a>
       </details>
@@ -79,10 +79,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#3">Job #3</a>
       </details>
@@ -98,10 +98,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#3">Job #3</a>
       </details>
@@ -134,10 +134,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#1">Job #1</a>
       </details>
@@ -153,10 +153,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#2">Job #2</a>
       </details>
@@ -172,10 +172,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#3">Job #3</a>
       </details>
@@ -191,10 +191,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#3">Job #3</a>
       </details>
@@ -225,10 +225,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#123-456">Job #123-456</a>
       </details>
@@ -261,10 +261,10 @@ describe "Junit annotate plugin parser" do
              got: 500
 
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
 
       in <a href="#1">Job #1</a>
       </details>
@@ -280,10 +280,10 @@ describe "Junit annotate plugin parser" do
              got: 500
 
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
 
       in <a href="#2">Job #2</a>
       </details>
@@ -299,10 +299,10 @@ describe "Junit annotate plugin parser" do
              got: 500
 
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
 
       in <a href="#3">Job #3</a>
       </details>
@@ -318,10 +318,10 @@ describe "Junit annotate plugin parser" do
              got: 500
 
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
 
       in <a href="#3">Job #3</a>
       </details>
@@ -354,10 +354,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#1">Job #1</a>
       </details>
@@ -373,10 +373,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#2">Job #2</a>
       </details>
@@ -392,10 +392,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#3">Job #3</a>
       </details>
@@ -411,10 +411,10 @@ describe "Junit annotate plugin parser" do
              got: 500
       
         (compared using eql?)
-      ./spec/models/account_spec.rb:78:in `block (3 levels) in <top (required)>'
-      ./spec/support/database.rb:16:in `block (2 levels) in <top (required)>'
-      ./spec/support/log.rb:17:in `run'
-      ./spec/support/log.rb:66:in `block (2 levels) in <top (required)>'</code></pre>
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
       
       in <a href="#3">Job #3</a>
       </details>
