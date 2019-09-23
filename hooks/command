@@ -53,7 +53,7 @@ if grep -q "<details>" "$annotation_path"; then
 
   echo "--- :buildkite: Creating annotation"
   # shellcheck disable=SC2002
-  cat "$annotation_path" | buildkite-agent annotate --context junit --style error
+  cat "$annotation_path" | buildkite-agent annotate --context ${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT:-junit} --style error
 
   if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR:-false}" =~ (true|on|1) ]]
   then

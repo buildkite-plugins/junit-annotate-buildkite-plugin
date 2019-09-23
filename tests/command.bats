@@ -65,6 +65,7 @@ load "$BATS_PATH/load.bash"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN="custom_(*)_pattern.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT="file"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=false
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT="junit_custom_context"
 
   artifacts_tmp="tests/tmp/$PWD/junit-artifacts"
   annotation_tmp="tests/tmp/$PWD/junit-annotation"
@@ -74,7 +75,7 @@ load "$BATS_PATH/load.bash"
     "-d junit-annotate-plugin-annotation-tmp.XXXXXXXXXX : mkdir -p $annotation_tmp; echo $annotation_tmp"
 
   stub buildkite-agent "artifact download junits/*.xml /plugin/tests/tmp//plugin/junit-artifacts : echo Downloaded artifacts" \
-                       "annotate --context junit --style error : echo Annotation added"
+                       "annotate --context junit_custom_context --style error : echo Annotation added"
 
   stub docker "--log-level error run --rm --volume /plugin/tests/tmp//plugin/junit-artifacts:/junits --volume /plugin/hooks/../ruby:/src --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN='custom_(*)_pattern.xml' --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT='file' ruby:2.5-alpine /src/bin/annotate /junits : echo '<details>Failure</details>'"
 
