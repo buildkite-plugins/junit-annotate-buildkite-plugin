@@ -16,6 +16,8 @@ configuration:
         - file
     fail-build-on-error:
       type: boolean
+    context:
+      type: string
   required:
     - artifacts
   additionalProperties: false

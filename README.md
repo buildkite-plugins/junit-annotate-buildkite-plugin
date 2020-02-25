@@ -51,6 +51,11 @@ If this setting is true and any errors are found in the JUnit XML files during
 parsing, the annotation step will exit with a non-zero value, which should cause 
 the build to fail.
 
+### `context` (optional)
+Default: `junit`
+
+The buildkite annotation context to use. Useful to differentiate multiple runs of this plugin in a single pipeline.
+
 ## Developing
 
 To test the plugin hooks (in Bash) and the junit parser (in Ruby):
