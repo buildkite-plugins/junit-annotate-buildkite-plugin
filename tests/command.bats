@@ -121,7 +121,7 @@ load "$BATS_PATH/load.bash"
   assert_output --partial "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS: unbound variable"
 }
 
-@test "fails if the annotation is larger than " {
+@test "fails if the annotation is larger than 1MB" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
 
   artifacts_tmp="tests/tmp/$PWD/junit-artifacts"
@@ -131,8 +131,8 @@ load "$BATS_PATH/load.bash"
     "-d junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX : mkdir -p $artifacts_tmp; echo $artifacts_tmp" \
     "-d junit-annotate-plugin-annotation-tmp.XXXXXXXXXX : mkdir -p $annotation_tmp; echo $annotation_tmp"
 
-  # 1kb over the 100k size limit of annotations
-  stub du "-k /plugin/tests/tmp//plugin/junit-annotation/annotation.md : echo 101 /plugin/tests/tmp//plugin/junit-annotation/annotation.md"
+  # 1KB over the 1MB size limit of annotations
+  stub du "-k /plugin/tests/tmp//plugin/junit-annotation/annotation.md : echo 1049 /plugin/tests/tmp//plugin/junit-annotation/annotation.md"
 
   stub buildkite-agent "artifact download junits/*.xml /plugin/tests/tmp//plugin/junit-artifacts : echo Downloaded artifacts"
 
