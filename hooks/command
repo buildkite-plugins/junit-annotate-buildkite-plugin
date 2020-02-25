@@ -46,14 +46,13 @@ cat "$annotation_path"
 if grep -q "<details>" "$annotation_path"; then
 
   if ! check_size; then
-      echo "--- :warning: Failures too large to annotate"
-      echo "The failures are too large to create a build annotation. Please inspect the failed JUnit artifacts manually."
-      exit 0
+    echo "--- :warning: Failures too large to annotate"
+    echo "The failures are too large to create a build annotation. Please inspect the failed JUnit artifacts manually."
+  else
+    echo "--- :buildkite: Creating annotation"
+    # shellcheck disable=SC2002
+    cat "$annotation_path" | buildkite-agent annotate --context "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT:-junit}" --style error
   fi
-
-  echo "--- :buildkite: Creating annotation"
-  # shellcheck disable=SC2002
-  cat "$annotation_path" | buildkite-agent annotate --context "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT:-junit}" --style error
 
   if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR:-false}" =~ (true|on|1) ]]
   then

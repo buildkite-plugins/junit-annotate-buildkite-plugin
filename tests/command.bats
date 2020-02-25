@@ -149,3 +149,32 @@ load "$BATS_PATH/load.bash"
   unstub du
   unstub mktemp
 }
+
+@test "returns an error if fail-build-on-error is true and annotation is too large" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=true
+
+  artifacts_tmp="tests/tmp/$PWD/junit-artifacts"
+  annotation_tmp="tests/tmp/$PWD/junit-annotation"
+
+  stub mktemp \
+    "-d junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX : mkdir -p $artifacts_tmp; echo $artifacts_tmp" \
+    "-d junit-annotate-plugin-annotation-tmp.XXXXXXXXXX : mkdir -p $annotation_tmp; echo $annotation_tmp"
+
+  # 1KB over the 1MB size limit of annotations
+  stub du "-k /plugin/tests/tmp//plugin/junit-annotation/annotation.md : echo 1025 /plugin/tests/tmp//plugin/junit-annotation/annotation.md"
+  
+  stub buildkite-agent "artifact download junits/*.xml /plugin/tests/tmp//plugin/junit-artifacts : echo Downloaded artifacts"
+
+  stub docker "--log-level error run --rm --volume /plugin/tests/tmp//plugin/junit-artifacts:/junits --volume /plugin/hooks/../ruby:/src --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN= --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT= ruby:2.7-alpine ruby /src/bin/annotate /junits : echo '<details>Failure</details>'"
+
+  run "$PWD/hooks/command"
+
+  assert_failure
+
+  assert_output --partial "Failures too large to annotate"
+
+  unstub mktemp
+  unstub buildkite-agent
+  unstub docker
+}
