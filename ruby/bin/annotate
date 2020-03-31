@@ -56,6 +56,8 @@ junit_report_files.sort.each do |file|
   xml = File.read(file)
   doc = Ox.load(xml, mode: :generic, skip: :skip_none)
 
+  next if doc.nil? # if a container times out, the junit is empty
+
   doc.locate('*/testsuite/testcase').each do |testcase|
     testcases += 1
     name = testcase.attributes[:name].to_s

@@ -499,4 +499,17 @@ describe "Junit annotate plugin parser" do
 
     assert_equal 0, status.exitstatus
   end
+
+  it "handles the empty junits that occur due to container timeouts" do
+    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/completely-empty/")
+
+    assert_equal <<~OUTPUT, output
+      Parsing junit.xml
+      --- ❓ Checking failures
+      0 testcases found
+      There were no failures/errors 🙌
+    OUTPUT
+
+    assert_equal 0, status.exitstatus
+  end
 end
