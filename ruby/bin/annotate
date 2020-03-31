@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'rexml/document'
-require 'rexml/element'
+require 'ox'
 require 'cgi/util'
 
 # Reads a list of junit files and returns a nice Buildkite build annotation on
@@ -16,6 +15,7 @@ job_pattern = '-(.*).xml' if !job_pattern || job_pattern.empty?
 
 failure_format = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT']
 failure_format = 'classname' if !failure_format || failure_format.empty?
+failure_format = failure_format.to_sym
 
 class Failure < Struct.new(:name, :failed_test, :body, :job, :type, :message)
 end
@@ -26,17 +26,21 @@ failures = []
 
 def text_content(element)
   # Handle mulptiple CDATA/text children elements
-  text = element.texts().map(&:value).join.strip
-  if text.empty?
-    nil
-  else
-    text
+  children = element.nodes.map do |node|
+    case node
+    when String then node
+    when Ox::Element then node.text
+    when Ox::CData then node.value
+    else raise ArgumentError, "unexpected node type: #{node.class}"
+    end
   end
+  text = children.join("\n").strip
+  text.empty? ? nil : text
 end
 
 def message_content(element)
   # Handle empty attributes
-  message = element.attributes['message'];
+  message = element.attributes[:message]
   if message.nil? || message.empty?
     nil
   else
@@ -50,16 +54,16 @@ junit_report_files.sort.each do |file|
   STDERR.puts "Parsing #{file.sub(junits_dir, '')}"
   job = File.basename(file)[/#{job_pattern}/, 1]
   xml = File.read(file)
-  doc = REXML::Document.new(xml)
+  doc = Ox.load(xml, mode: :generic, skip: :skip_none)
 
-  REXML::XPath.each(doc, '//testsuite//testcase') do |testcase|
+  doc.locate('*/testsuite/testcase').each do |testcase|
     testcases += 1
-    name = testcase.attributes['name'].to_s
+    name = testcase.attributes[:name].to_s
     failed_test = testcase.attributes[failure_format].to_s
-    testcase.elements.each("failure") do |failure|
+    testcase.locate('failure').each do |failure|
       failures << Failure.new(name, failed_test, text_content(failure), job, :failure, message_content(failure))
     end
-    testcase.elements.each("error") do |error|
+    testcase.locate('error').each do |error|
       failures << Failure.new(name, failed_test, text_content(error), job, :error, message_content(error))
     end
   end

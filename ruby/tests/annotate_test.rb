@@ -492,7 +492,7 @@ describe "Junit annotate plugin parser" do
       <p>expected: 250 got: 500 (compared using eql?)</p>
 
       <pre><code>First line of failure output
-            Second line of failure output</code></pre>
+      Second line of failure output</code></pre>
 
       </details>
     OUTPUT
