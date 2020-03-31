@@ -44,11 +44,11 @@ There are two options for this:
 * `file`
   * displays: `MyClass::UnderTest text of the failed expectation in path/to/my_class/under_test.file_ext`
 
-### `fail-build-on-error` (optional)  
+### `fail-build-on-error` (optional)
 Default: `false`
 
 If this setting is true and any errors are found in the JUnit XML files during
-parsing, the annotation step will exit with a non-zero value, which should cause 
+parsing, the annotation step will exit with a non-zero value, which should cause
 the build to fail.
 
 ### `context` (optional)
@@ -61,8 +61,7 @@ The buildkite annotation context to use. Useful to differentiate multiple runs o
 To test the plugin hooks (in Bash) and the junit parser (in Ruby):
 
 ```bash
-docker-compose run --rm plugin &&
-docker-compose run --rm ruby
+docker-compose run --rm linter && docker-compose run --rm plugin && docker-compose run --rm ruby
 ```
 
 To test the Ruby parser locally:

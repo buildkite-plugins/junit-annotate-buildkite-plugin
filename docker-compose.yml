@@ -1,5 +1,10 @@
 version: '2'
 services:
+  linter:
+    image: buildkite/plugin-linter
+    command: ['--id', 'junit-annotate']
+    volumes:
+      - ".:/plugin:ro"
   plugin:
     image: buildkite/plugin-tester:latest@sha256:9fc083858d97a83b44b311e3b9c81333469e683eb292c7df08502ae4dd2732f7
     volumes:
