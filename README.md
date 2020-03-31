@@ -61,7 +61,7 @@ The buildkite annotation context to use. Useful to differentiate multiple runs o
 To test the plugin hooks (in Bash) and the junit parser (in Ruby):
 
 ```bash
-docker-compose run --rm linter && docker-compose run --rm plugin && docker-compose run --rm ruby
+docker-compose run --rm plugin && docker-compose run --rm ruby && docker-compose run --rm linter
 ```
 
 To test the Ruby parser locally:
