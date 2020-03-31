@@ -30,6 +30,8 @@ buildkite-agent artifact download \
 
 echo "--- :junit: Processing the junits"
 
+docker build -t junit_annotate_buildkite_plugin_workenv "$PLUGIN_DIR"
+
 docker \
   --log-level "error" \
   run \
@@ -38,7 +40,7 @@ docker \
     --volume "$PLUGIN_DIR/ruby:/src" \
     --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}" \
     --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT:-}" \
-    ruby:2.7-alpine ruby /src/bin/annotate /junits \
+    junit_annotate_buildkite_plugin_workenv ruby /src/bin/annotate /junits \
       > "$annotation_path"
 
 cat "$annotation_path"

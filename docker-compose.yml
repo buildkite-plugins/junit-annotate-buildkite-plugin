@@ -13,6 +13,7 @@ services:
       - ruby
   ruby:
     build: .
+    image: ruby:junit_annotate_buildkite_plugin_workenv
     command: rake
     working_dir: /src
     volumes:
