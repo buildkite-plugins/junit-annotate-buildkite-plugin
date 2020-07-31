@@ -20,7 +20,7 @@ failure_format = 'classname' if !failure_format || failure_format.empty?
 class Failure < Struct.new(:name, :failed_test, :body, :job, :type, :message)
 end
 
-junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"))
+junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"), File::FNM_DOTMATCH)
 testcases = 0
 failures = []
 

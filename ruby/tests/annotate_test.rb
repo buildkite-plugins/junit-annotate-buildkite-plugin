@@ -499,4 +499,17 @@ describe "Junit annotate plugin parser" do
 
     assert_equal 0, status.exitstatus
   end
+
+  it "handles junit dir paths with hidden directories" do
+    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/.tests-in-hidden-dir/")
+
+    assert_equal <<~OUTPUT, output
+      Parsing junit-1.xml
+      --- ❓ Checking failures
+      2 testcases found
+      There were no failures/errors 🙌
+    OUTPUT
+
+    assert_equal 0, status.exitstatus
+  end
 end
