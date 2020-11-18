@@ -6,7 +6,7 @@ services:
     volumes:
       - ".:/plugin:ro"
   plugin:
-    image: buildkite/plugin-tester:latest@sha256:9fc083858d97a83b44b311e3b9c81333469e683eb292c7df08502ae4dd2732f7
+    image: buildkite/plugin-tester:latest@sha256:476a1024936901889147f53d2a3d8e71e99d76404972d583825514f5608083dc
     volumes:
       - ".:/plugin"
     depends_on:

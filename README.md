@@ -1,4 +1,4 @@
-# JUnit Annotate Buildkite Plugin
+# JUnit Annotate Buildkite Plugin [![Build status](https://badge.buildkite.com/e57701b1037f2c77d0b3f2e4901559ed2e8f131119cd7806ad.svg?branch=master)](https://buildkite.com/buildkite/plugins-junit-annotate)
 
 A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) that parses junit.xml artifacts (generated across any number of parallel steps) and creates a [build annotation](https://buildkite.com/docs/agent/v3/cli-annotate) listing the individual tests that failed.
 
