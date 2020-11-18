@@ -1,4 +1,4 @@
-FROM ruby:2.7-alpine
+FROM docker.artifactory.internal.amount.com/ruby:2.7-alpine
 
 RUN apk add --update-cache build-base && \
     gem install ox && \
