@@ -52,7 +52,7 @@ junit_report_files.sort.each do |file|
   xml = File.read(file)
   doc = REXML::Document.new(xml)
 
-  REXML::XPath.each(doc, '//testsuite//testcase') do |testcase|
+  REXML::XPath.each(doc, '//testsuite/testcase') do |testcase|
     testcases += 1
     name = testcase.attributes['name'].to_s
     failed_test = testcase.attributes[failure_format].to_s
