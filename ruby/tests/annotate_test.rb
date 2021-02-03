@@ -9,7 +9,7 @@ describe "Junit annotate plugin parser" do
       Parsing junit-1.xml
       Parsing junit-2.xml
       Parsing junit-3.xml
-      --- ❓ Checking failures
+      --- ✍️ Preparing annotation
       8 testcases found
       There were no failures/errors 🙌
     OUTPUT
@@ -24,10 +24,9 @@ describe "Junit annotate plugin parser" do
       Parsing junit-1.xml
       Parsing junit-2.xml
       Parsing junit-3.xml
-      --- ❓ Checking failures
+      --- ✍️ Preparing annotation
       6 testcases found
       There are 4 failures/errors 😭
-      --- ✍️ Preparing annotation
       4 failures:
       
       <details>
@@ -107,7 +106,7 @@ describe "Junit annotate plugin parser" do
       </details>
     OUTPUT
 
-    assert_equal 0, status.exitstatus
+    assert_equal 64, status.exitstatus
   end
 
   it "handles failures and errors across multiple files" do
@@ -117,10 +116,9 @@ describe "Junit annotate plugin parser" do
       Parsing junit-1.xml
       Parsing junit-2.xml
       Parsing junit-3.xml
-      --- ❓ Checking failures
+      --- ✍️ Preparing annotation
       6 testcases found
       There are 4 failures/errors 😭
-      --- ✍️ Preparing annotation
       2 failures and 2 errors:
       
       <details>
@@ -200,7 +198,7 @@ describe "Junit annotate plugin parser" do
       </details>
     OUTPUT
 
-    assert_equal 0, status.exitstatus
+    assert_equal 64, status.exitstatus
   end
 
   it "accepts custom regex filename patterns for job id" do
@@ -208,10 +206,9 @@ describe "Junit annotate plugin parser" do
 
     assert_equal <<~OUTPUT, output
       Parsing junit-123-456-custom-pattern.xml
-      --- ❓ Checking failures
+      --- ✍️ Preparing annotation
       2 testcases found
       There is 1 failure/error 😭
-      --- ✍️ Preparing annotation
       1 failure:
       
       <details>
@@ -234,7 +231,7 @@ describe "Junit annotate plugin parser" do
       </details>
     OUTPUT
 
-    assert_equal 0, status.exitstatus
+    assert_equal 64, status.exitstatus
   end
 
   it "uses the file path instead of classname for annotation content when specified" do
@@ -244,10 +241,9 @@ describe "Junit annotate plugin parser" do
       Parsing junit-1.xml
       Parsing junit-2.xml
       Parsing junit-3.xml
-      --- ❓ Checking failures
+      --- ✍️ Preparing annotation
       6 testcases found
       There are 4 failures/errors 😭
-      --- ✍️ Preparing annotation
       2 failures and 2 errors:
 
       <details>
@@ -327,7 +323,7 @@ describe "Junit annotate plugin parser" do
       </details>
     OUTPUT
 
-    assert_equal 0, status.exitstatus
+    assert_equal 64, status.exitstatus
   end
 
   it "handles failures across multiple files in sub dirs" do
@@ -337,10 +333,9 @@ describe "Junit annotate plugin parser" do
       Parsing sub-dir/junit-1.xml
       Parsing sub-dir/junit-2.xml
       Parsing sub-dir/junit-3.xml
-      --- ❓ Checking failures
+      --- ✍️ Preparing annotation
       6 testcases found
       There are 4 failures/errors 😭
-      --- ✍️ Preparing annotation
       4 failures:
       
       <details>
@@ -420,7 +415,7 @@ describe "Junit annotate plugin parser" do
       </details>
     OUTPUT
 
-    assert_equal 0, status.exitstatus
+    assert_equal 64, status.exitstatus
   end
 
   it "handles empty failure bodies" do
@@ -428,10 +423,9 @@ describe "Junit annotate plugin parser" do
 
     assert_equal <<~OUTPUT, output
       Parsing junit.xml
-      --- ❓ Checking failures
+      --- ✍️ Preparing annotation
       2 testcases found
       There is 1 failure/error 😭
-      --- ✍️ Preparing annotation
       1 failure:
 
       <details>
@@ -442,7 +436,7 @@ describe "Junit annotate plugin parser" do
       </details>
     OUTPUT
 
-    assert_equal 0, status.exitstatus
+    assert_equal 64, status.exitstatus
   end
 
   it "handles missing message attributes" do
@@ -450,10 +444,9 @@ describe "Junit annotate plugin parser" do
 
     assert_equal <<~OUTPUT, output
       Parsing junit.xml
-      --- ❓ Checking failures
+      --- ✍️ Preparing annotation
       4 testcases found
       There are 3 failures/errors 😭
-      --- ✍️ Preparing annotation
       1 failure and 2 errors:
 
       <details>
@@ -472,7 +465,7 @@ describe "Junit annotate plugin parser" do
       </details>
     OUTPUT
 
-    assert_equal 0, status.exitstatus
+    assert_equal 64, status.exitstatus
   end
 
   it "handles cdata formatted XML files" do
@@ -480,10 +473,9 @@ describe "Junit annotate plugin parser" do
 
     assert_equal <<~OUTPUT, output
       Parsing junit.xml
-      --- ❓ Checking failures
+      --- ✍️ Preparing annotation
       2 testcases found
       There is 1 failure/error 😭
-      --- ✍️ Preparing annotation
       1 error:
 
       <details>
@@ -494,6 +486,36 @@ describe "Junit annotate plugin parser" do
       <pre><code>First line of failure output
             Second line of failure output</code></pre>
 
+      </details>
+    OUTPUT
+
+    assert_equal 64, status.exitstatus
+  end
+
+  it "reports specified amount of slowest tests" do
+    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=5", "#{__dir__}/../bin/annotate", "#{__dir__}/no-test-failures/")
+
+    assert_equal <<~OUTPUT, output
+      Parsing junit-1.xml
+      Parsing junit-2.xml
+      Parsing junit-3.xml
+      --- ✍️ Preparing annotation
+      8 testcases found
+      There were no failures/errors 🙌
+      Reporting slowest tests ⏱
+      <details>
+      <summary>5 slowest tests</summary>
+
+      <table>
+      <thead><tr><th>Unit</th><th>Test</th><th>Time</th></tr></thead>
+      <tbody>
+      <tr><td>spec.models.account_spec</td><td>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default</td><td>0.977127</td></tr>
+      <tr><td>spec.models.account_spec</td><td>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default</td><td>0.967127</td></tr>
+      <tr><td>spec.models.account_spec</td><td>Account#maximum_jobs_added_by_pipeline_changer returns 500 if the account is ABC</td><td>0.620013</td></tr>
+      <tr><td>spec.models.account_spec</td><td>Account#maximum_jobs_added_by_pipeline_changer returns 900 if the account is F00</td><td>0.520013</td></tr>
+      <tr><td>spec.models.account_spec</td><td>Account#maximum_jobs_added_by_pipeline_changer returns 700 if the account is XYZ</td><td>0.420013</td></tr>
+      </tbody>
+      </table>
       </details>
     OUTPUT
 

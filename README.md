@@ -56,6 +56,11 @@ Default: `junit`
 
 The buildkite annotation context to use. Useful to differentiate multiple runs of this plugin in a single pipeline.
 
+### `report-slowest` (optional)
+Default: `0`
+
+Adds a table with the specified amount of slowest tests listed in the JUnit XML files. The annotation will also be shown when all tests are successful.
+
 ## Developing
 
 To test the plugin hooks (in Bash) and the junit parser (in Ruby):
