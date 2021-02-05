@@ -59,7 +59,7 @@ The buildkite annotation context to use. Useful to differentiate multiple runs o
 ### `report-slowest` (optional)
 Default: `0`
 
-Adds a table with the specified amount of slowest tests listed in the JUnit XML files. The annotation will also be shown when all tests are successful.
+Include the specified number of slowest tests in the annotation. The annotation will always be shown.
 
 ## Developing
 
