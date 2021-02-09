@@ -142,7 +142,7 @@ load "$BATS_PATH/load.bash"
 
   assert_success
 
-  assert_output --partial "Report too large to annotate"
+  assert_output --partial "Failures too large to annotate"
 
   unstub docker
   unstub buildkite-agent
@@ -172,7 +172,7 @@ load "$BATS_PATH/load.bash"
 
   assert_failure
 
-  assert_output --partial "Report too large to annotate"
+  assert_output --partial "Failures too large to annotate"
 
   unstub mktemp
   unstub buildkite-agent
