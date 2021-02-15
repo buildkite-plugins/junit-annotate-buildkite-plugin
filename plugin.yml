@@ -18,6 +18,8 @@ configuration:
       type: boolean
     context:
       type: string
+    report-slowest:
+      type: integer
   required:
     - artifacts
   additionalProperties: false

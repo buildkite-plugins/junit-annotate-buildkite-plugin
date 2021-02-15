@@ -17,12 +17,18 @@ job_pattern = '-(.*).xml' if !job_pattern || job_pattern.empty?
 failure_format = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT']
 failure_format = 'classname' if !failure_format || failure_format.empty?
 
-class Failure < Struct.new(:name, :failed_test, :body, :job, :type, :message)
+report_slowest = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST'].to_i
+
+class Failure < Struct.new(:name, :unit_name, :body, :job, :type, :message)
+end
+
+class Timing < Struct.new(:name, :unit_name, :time)
 end
 
 junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"))
 testcases = 0
 failures = []
+timings = []
 
 def text_content(element)
   # Handle mulptiple CDATA/text children elements
@@ -55,48 +61,65 @@ junit_report_files.sort.each do |file|
   REXML::XPath.each(doc, '//testsuite/testcase') do |testcase|
     testcases += 1
     name = testcase.attributes['name'].to_s
-    failed_test = testcase.attributes[failure_format].to_s
+    unit_name = testcase.attributes[failure_format].to_s
+    time = testcase.attributes['time'].to_f
+    timings << Timing.new(name, unit_name, time)
     testcase.elements.each("failure") do |failure|
-      failures << Failure.new(name, failed_test, text_content(failure), job, :failure, message_content(failure))
+      failures << Failure.new(name, unit_name, text_content(failure), job, :failure, message_content(failure))
     end
     testcase.elements.each("error") do |error|
-      failures << Failure.new(name, failed_test, text_content(error), job, :error, message_content(error))
+      failures << Failure.new(name, unit_name, text_content(error), job, :error, message_content(error))
     end
   end
-end
-
-STDERR.puts "--- ❓ Checking failures"
-STDERR.puts "#{testcases} testcases found"
-
-if failures.empty?
-  STDERR.puts "There were no failures/errors 🙌"
-  exit 0
-else
-  STDERR.puts "There #{failures.length == 1 ? "is 1 failure/error" : "are #{failures.length} failures/errors" } 😭"
 end
 
 STDERR.puts "--- ✍️ Preparing annotation"
+STDERR.puts "#{testcases} testcases found"
 
-failures_count = failures.select {|f| f.type == :failure }.length
-errors_count = failures.select {|f| f.type == :error }.length
+if failures.any?
+  STDERR.puts "There #{failures.length == 1 ? "is 1 failure/error" : "are #{failures.length} failures/errors" } 😭"
 
-puts [
-  failures_count == 0 ? nil : (failures_count == 1 ? "1 failure" : "#{failures_count} failures"),
-  errors_count === 0 ? nil : (errors_count == 1 ? "1 error" : "#{errors_count} errors"),
-].compact.join(" and ") + ":\n\n"
+  failures_count = failures.select {|f| f.type == :failure }.length
+  errors_count = failures.select {|f| f.type == :error }.length
+  puts [
+    failures_count == 0 ? nil : (failures_count == 1 ? "1 failure" : "#{failures_count} failures"),
+    errors_count === 0 ? nil : (errors_count == 1 ? "1 error" : "#{errors_count} errors"),
+  ].compact.join(" and ") + ":\n\n"
 
-failures.each do |failure|
-  puts "<details>"
-  puts "<summary><code>#{failure.name} in #{failure.failed_test}</code></summary>\n\n"
-  if failure.message
-    puts "<p>#{failure.message.chomp.strip}</p>\n\n"
+  failures.each do |failure|
+    puts "<details>"
+    puts "<summary><code>#{failure.name} in #{failure.unit_name}</code></summary>\n\n"
+    if failure.message
+      puts "<p>#{failure.message.chomp.strip}</p>\n\n"
+    end
+    if failure.body
+      puts "<pre><code>#{CGI.escapeHTML(failure.body.chomp.strip)}</code></pre>\n\n"
+    end
+    if failure.job
+      puts "in <a href=\"##{failure.job}\">Job ##{failure.job}</a>"
+    end
+    puts "</details>"
+    puts "" unless failure == failures.last
   end
-  if failure.body
-    puts "<pre><code>#{CGI.escapeHTML(failure.body.chomp.strip)}</code></pre>\n\n"
-  end
-  if failure.job
-    puts "in <a href=\"##{failure.job}\">Job ##{failure.job}</a>"
-  end
-  puts "</details>"
-  puts "" unless failure == failures.last
+
+else
+  STDERR.puts "There were no failures/errors 🙌"
 end
+
+if report_slowest > 0
+  STDERR.puts "Reporting slowest tests ⏱"
+
+  puts "<details>"
+  puts "<summary>#{report_slowest} slowest tests</summary>\n\n"
+  puts "<table>"
+  puts "<thead><tr><th>Unit</th><th>Test</th><th>Time</th></tr></thead>"
+  puts "<tbody>"
+  timings.sort_by(&:time).reverse.take(report_slowest).each do |timing|
+    puts "<tr><td>#{timing.unit_name}</td><td>#{timing.name}</td><td>#{timing.time}</td></tr>"
+  end
+  puts "</tbody>"
+  puts "</table>"
+  puts "</details>"
+end
+
+exit 64 if failures.any? # special exit code to signal test failures

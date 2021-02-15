@@ -10,6 +10,8 @@ echo "--- :junit: Download the junits"
 artifacts_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX")"
 annotation_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-annotation-tmp.XXXXXXXXXX")"
 annotation_path="${annotation_dir}/annotation.md"
+annotation_style="info"
+fail_build=0
 
 function cleanup {
   rm -rf "${artifacts_dir}"
@@ -30,6 +32,7 @@ buildkite-agent artifact download \
 
 echo "--- :junit: Processing the junits"
 
+set +e
 docker \
   --log-level "error" \
   run \
@@ -38,25 +41,35 @@ docker \
     --volume "$PLUGIN_DIR/ruby:/src" \
     --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}" \
     --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT:-}" \
+    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST:-}" \
     ruby:2.7-alpine ruby /src/bin/annotate /junits \
       > "$annotation_path"
+
+if [[ $? -eq 64 ]]; then # special exit code to signal test failures
+  annotation_style="error"
+  if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR:-false}" =~ (true|on|1) ]]; then
+    fail_build=1
+  fi
+fi
+
+set -e
 
 cat "$annotation_path"
 
 if grep -q "<details>" "$annotation_path"; then
-
   if ! check_size; then
     echo "--- :warning: Failures too large to annotate"
     echo "The failures are too large to create a build annotation. Please inspect the failed JUnit artifacts manually."
   else
     echo "--- :buildkite: Creating annotation"
     # shellcheck disable=SC2002
-    cat "$annotation_path" | buildkite-agent annotate --context "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT:-junit}" --style error
+    cat "$annotation_path" | buildkite-agent annotate --context "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT:-junit}" --style "$annotation_style"
   fi
+fi
 
-  if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR:-false}" =~ (true|on|1) ]]
-  then
-    echo "--- :boom: Failing build due to error"
-    exit 1
-  fi
+if ((fail_build)); then
+  echo "--- :boom: Failing build due to error"
+  exit 1
+else
+  exit 0
 fi
