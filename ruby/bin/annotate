@@ -25,7 +25,7 @@ end
 class Timing < Struct.new(:name, :unit_name, :time)
 end
 
-junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"))
+junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"), File::FNM_DOTMATCH)
 testcases = 0
 failures = []
 timings = []
