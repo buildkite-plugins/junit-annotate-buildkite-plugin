@@ -22,6 +22,10 @@ configuration:
       type: integer
     job-uuid-file-pattern:
       type: string
+    add-error-annotation:
+      type: boolean
+    context:
+      type: string
     min-tests:
       type: integer
     report-skipped:
