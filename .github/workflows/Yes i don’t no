@@ -1,4 +1,4 @@
-name: Release Drafter
+Labeler10
 
 on:
   push:
