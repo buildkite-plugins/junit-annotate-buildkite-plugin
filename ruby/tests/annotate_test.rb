@@ -527,7 +527,7 @@ describe "Junit annotate plugin parser" do
 
     assert_equal <<~OUTPUT, output
       Parsing junit-1.xml
-      --- ❓ Checking failures
+      --- ✍️ Preparing annotation
       2 testcases found
       There were no failures/errors 🙌
     OUTPUT
