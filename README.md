@@ -87,6 +87,6 @@ steps:
           ...
 ```
 
-## License
+## License Free
 
 MIT (see [LICENSE](LICENSE))
