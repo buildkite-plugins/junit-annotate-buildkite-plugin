@@ -13,5 +13,5 @@ steps:
         id: junit-annotate
   - label: ":bash: Shellcheck"
     plugins:
-      shellcheck#v1.1.2:
+      shellcheck#v1.2.0:
         files: hooks/*
