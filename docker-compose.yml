@@ -7,7 +7,7 @@ services:
     depends_on:
       - ruby
   ruby:
-    image: ruby:3.1-alpine@sha256:0b91e98c4613c2287bb7274a1584ea141b68960fb6b0edd7fe32127dc888d1a0
+    image: ruby:3.1-alpine@sha256:bb33cf92e4cca5774e3ed1113646f0820dcdeb0cccb705576d0413b4fca9e76c
     command: rake
     working_dir: /src
     volumes:
