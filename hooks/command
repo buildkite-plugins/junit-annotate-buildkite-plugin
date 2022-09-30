@@ -3,7 +3,7 @@
 set -euo pipefail
 
 PLUGIN_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)/.."
-MAX_SIZE=1024 # in KB
+MAX_SIZE={BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MAX_REPORT_SIZE-:1024} # in KB
 
 echo "--- :junit: Download the junits"
 

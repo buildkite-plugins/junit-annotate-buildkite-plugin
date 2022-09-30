@@ -18,6 +18,7 @@ failure_format = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT']
 failure_format = 'classname' if !failure_format || failure_format.empty?
 
 report_slowest = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST'].to_i
+max_report_size = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MAX_REPORT_SIZE'].to_i
 
 class Failure < Struct.new(:name, :unit_name, :body, :job, :type, :message)
 end

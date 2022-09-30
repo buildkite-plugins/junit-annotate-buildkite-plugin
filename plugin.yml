@@ -20,6 +20,8 @@ configuration:
       type: string
     report-slowest:
       type: integer
+    max-report-size:
+      type: integer
   required:
     - artifacts
   additionalProperties: false
