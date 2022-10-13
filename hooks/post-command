@@ -5,16 +5,18 @@ set -euo pipefail
 PLUGIN_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)/.."
 MAX_SIZE=1024 # in KB
 
-echo "--- :junit: Download the junits"
+echo "--- :junit: Verify Directory"
 
-artifacts_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX")"
+if [ ! -d "$BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_DIRECTORY" ]; then
+  echo "$BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_DIRECTORY does not exist."
+fi
+
 annotation_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-annotation-tmp.XXXXXXXXXX")"
 annotation_path="${annotation_dir}/annotation.md"
 annotation_style="info"
 fail_build=0
 
 function cleanup {
-  rm -rf "${artifacts_dir}"
   rm -rf "${annotation_dir}"
 }
 
@@ -26,9 +28,7 @@ function check_size {
 
 trap cleanup EXIT
 
-buildkite-agent artifact download \
-  "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS}" \
-  "$artifacts_dir"
+xmls_dir=$(readlink -f $BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_DIRECTORY)
 
 echo "--- :junit: Processing the junits"
 
@@ -37,17 +37,17 @@ docker \
   --log-level "error" \
   run \
     --rm \
-    --volume "$artifacts_dir:/junits" \
+    --volume "$xmls_dir:/junits" \
     --volume "$PLUGIN_DIR/ruby:/src" \
-    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}" \
-    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT:-}" \
-    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST:-}" \
+    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_JOB_UUID_FILE_PATTERN:-}" \
+    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_FAILURE_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_FAILURE_FORMAT:-}" \
+    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_REPORT_SLOWEST=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_REPORT_SLOWEST:-}" \
     ruby:2.7-alpine ruby /src/bin/annotate /junits \
       > "$annotation_path"
 
 if [[ $? -eq 64 ]]; then # special exit code to signal test failures
   annotation_style="error"
-  if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR:-false}" =~ (true|on|1) ]]; then
+  if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_FAIL_BUILD_ON_ERROR:-false}" =~ (true|on|1) ]]; then
     fail_build=1
   fi
 fi
@@ -63,8 +63,15 @@ if grep -q "<details>" "$annotation_path"; then
     echo "$msg"
   else
     echo "--- :buildkite: Creating annotation"
+    args=(
+      --context "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_CONTEXT:-junit}"
+      --style "$annotation_style"
+    )
+    if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_APPEND:-false}" =~ (true|on|1) ]]; then
+      args+=( --append )
+    fi
     # shellcheck disable=SC2002
-    cat "$annotation_path" | buildkite-agent annotate --context "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT:-junit}" --style "$annotation_style"
+    cat "$annotation_path" | buildkite-agent annotate "${args[@]}"
   fi
 fi
 

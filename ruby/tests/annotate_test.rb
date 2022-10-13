@@ -202,7 +202,7 @@ describe "Junit annotate plugin parser" do
   end
 
   it "accepts custom regex filename patterns for job id" do
-    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=junit-(.*)-custom-pattern.xml", "#{__dir__}/../bin/annotate", "#{__dir__}/custom-job-uuid-pattern/")
+    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_JOB_UUID_FILE_PATTERN=junit-(.*)-custom-pattern.xml", "#{__dir__}/../bin/annotate", "#{__dir__}/custom-job-uuid-pattern/")
 
     assert_equal <<~OUTPUT, output
       Parsing junit-123-456-custom-pattern.xml
@@ -235,7 +235,7 @@ describe "Junit annotate plugin parser" do
   end
 
   it "uses the file path instead of classname for annotation content when specified" do
-    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=file", "#{__dir__}/../bin/annotate", "#{__dir__}/test-failure-and-error/")
+    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_FAILURE_FORMAT=file", "#{__dir__}/../bin/annotate", "#{__dir__}/test-failure-and-error/")
 
     assert_equal <<~OUTPUT, output
       Parsing junit-1.xml
@@ -493,7 +493,7 @@ describe "Junit annotate plugin parser" do
   end
 
   it "reports specified amount of slowest tests" do
-    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=5", "#{__dir__}/../bin/annotate", "#{__dir__}/no-test-failures/")
+    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_LOCAL_REPORT_SLOWEST=5", "#{__dir__}/../bin/annotate", "#{__dir__}/no-test-failures/")
 
     assert_equal <<~OUTPUT, output
       Parsing junit-1.xml

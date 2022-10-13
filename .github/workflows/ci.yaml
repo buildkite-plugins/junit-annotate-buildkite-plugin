@@ -1,0 +1,45 @@
+name: Checks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  ruby-test:
+    name: ruby test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: isbang/compose-action@v1.3.2
+        with:
+          compose-file: "./docker-compose.yml"
+          services: ruby
+  plugin-test:
+    name: plugin test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: isbang/compose-action@v1.3.2
+        with:
+          compose-file: "./docker-compose.yml"
+          services: plugin
+  plugin-lint:
+    name: plugin test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: isbang/compose-action@v1.3.2
+        with:
+          compose-file: "./docker-compose.yml"
+          services: lint
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './hooks'

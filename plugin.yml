@@ -1,11 +1,11 @@
-name: Junit Annotate
-description: Annotates your build using JUnit XML reports
-author: https://github.com/buildkite
+name: Junit Annotate Local
+description: Annotates your build using JUnit XML reports from local files
+author: https://github.com/rippling
 requirements:
   - docker
 configuration:
   properties:
-    artifacts:
+    directory:
       type: string
     job-uuid-file-pattern:
       type: string
@@ -20,6 +20,8 @@ configuration:
       type: string
     report-slowest:
       type: integer
+    append:
+      type: boolean
   required:
-    - artifacts
+    - directory
   additionalProperties: false
