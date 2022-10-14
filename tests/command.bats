@@ -8,12 +8,13 @@ load "${BATS_PLUGIN_PATH}/load.bash"
 # export DOCKER_STUB_DEBUG=/dev/tty
 # export DU_STUB_DEBUG=/dev/tty
 
+export artifacts_tmp="tests/tmp/junit-artifacts"
+export annotation_tmp="tests/tmp/junit-annotation"
+
+
 @test "runs the annotator and creates the annotation" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=false
-
-  artifacts_tmp="tests/tmp/$PWD/junit-artifacts"
-  annotation_tmp="tests/tmp/$PWD/junit-annotation"
 
   stub mktemp \
     "-d junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX : mkdir -p $artifacts_tmp; echo $artifacts_tmp" \
@@ -38,9 +39,6 @@ load "${BATS_PLUGIN_PATH}/load.bash"
 @test "returns an error if fail-build-on-error is true" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=true
-
-  artifacts_tmp="tests/tmp/$PWD/junit-artifacts"
-  annotation_tmp="tests/tmp/$PWD/junit-annotation"
 
   stub mktemp \
     "-d junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX : mkdir -p $artifacts_tmp; echo $artifacts_tmp" \
@@ -67,9 +65,6 @@ load "${BATS_PLUGIN_PATH}/load.bash"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=false
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT="junit_custom_context"
 
-  artifacts_tmp="tests/tmp/$PWD/junit-artifacts"
-  annotation_tmp="tests/tmp/$PWD/junit-annotation"
-
   stub mktemp \
     "-d junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX : mkdir -p $artifacts_tmp; echo $artifacts_tmp" \
     "-d junit-annotate-plugin-annotation-tmp.XXXXXXXXXX : mkdir -p $annotation_tmp; echo $annotation_tmp"
@@ -92,9 +87,6 @@ load "${BATS_PLUGIN_PATH}/load.bash"
 
 @test "doesn't create annotation unless there's failures" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
-
-  artifacts_tmp="tests/tmp/$PWD/junit-artifacts"
-  annotation_tmp="tests/tmp/$PWD/junit-annotation"
 
   stub mktemp \
     "-d junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX : mkdir -p $artifacts_tmp; echo $artifacts_tmp" \
@@ -124,9 +116,6 @@ load "${BATS_PLUGIN_PATH}/load.bash"
 @test "fails if the annotation is larger than 1MB" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
 
-  artifacts_tmp="tests/tmp/$PWD/junit-artifacts"
-  annotation_tmp="tests/tmp/$PWD/junit-annotation"
-
   stub mktemp \
     "-d junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX : mkdir -p $artifacts_tmp; echo $artifacts_tmp" \
     "-d junit-annotate-plugin-annotation-tmp.XXXXXXXXXX : mkdir -p $annotation_tmp; echo $annotation_tmp"
@@ -153,9 +142,6 @@ load "${BATS_PLUGIN_PATH}/load.bash"
 @test "returns an error if fail-build-on-error is true and annotation is too large" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=true
-
-  artifacts_tmp="tests/tmp/$PWD/junit-artifacts"
-  annotation_tmp="tests/tmp/$PWD/junit-annotation"
 
   stub mktemp \
     "-d junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX : mkdir -p $artifacts_tmp; echo $artifacts_tmp" \
