@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load "$BATS_PATH/load.bash"
+load "${BATS_PLUGIN_PATH}/load.bash"
 
 # Uncomment to get debug output from each stub
 # export MKTEMP_STUB_DEBUG=/dev/tty
