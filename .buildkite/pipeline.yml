@@ -1,11 +1,11 @@
 steps:
   - label: ":bash: Plugin"
     plugins:
-      docker-compose#v3.9.0:
+      docker-compose#v4.1.1:
         run: plugin
   - label: ":ruby: Ruby"
     plugins:
-      docker-compose#v3.9.0:
+      docker-compose#v4.1.1:
         run: ruby
   - label: "✨ Lint"
     plugins:
@@ -13,5 +13,5 @@ steps:
         id: junit-annotate
   - label: ":bash: Shellcheck"
     plugins:
-      shellcheck#v1.2.0:
+      shellcheck#v1.3.0:
         files: hooks/*
