@@ -31,16 +31,17 @@ export annotation_tmp="tests/tmp/junit-annotation"
 
   assert_success
 
-  assert_output --partial "Annotation added"
+  assert_output --partial "Annotation added with context junit and style error"
   
   unstub mktemp
   unstub buildkite-agent
   unstub docker
 }
 
-@test "returns an error if fail-build-on-error is true" {
+
+@test "can define a special context" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
-  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=true
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT="junit_custom_context"
 
   stub mktemp \
     "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
@@ -55,19 +56,17 @@ export annotation_tmp="tests/tmp/junit-annotation"
 
   run "$PWD/hooks/command"
 
-  assert_failure
+  assert_success
 
+  assert_output --partial "Annotation added with context junit_custom_context"
+  
   unstub mktemp
   unstub buildkite-agent
   unstub docker
 }
-
-@test "can pass through optional params" {
+@test "can pass through optional job uuid file pattern" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN="custom_(*)_pattern.xml"
-  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT="file"
-  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=false
-  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT="junit_custom_context"
 
   stub mktemp \
     "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
@@ -79,6 +78,33 @@ export annotation_tmp="tests/tmp/junit-annotation"
 
   stub docker \
     "--log-level error run --rm --volume \* --volume \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN='custom_(*)_pattern.xml' --env \* --env \* ruby:2.7-alpine ruby /src/bin/annotate /junits : echo '<details>Failure</details>' && exit 64"
+
+  run "$PWD/hooks/command"
+
+  assert_success
+
+  assert_output --partial "Annotation added"
+
+  unstub mktemp
+  unstub buildkite-agent
+  unstub docker
+}
+
+@test "can pass through optional failure format" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT="junit_custom_context"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT="file"
+
+  stub mktemp \
+    "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
+    "-d \* : mkdir -p '$annotation_tmp'; echo '$annotation_tmp'"
+
+  stub buildkite-agent \
+    "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
+    "annotate --context \* --style \* : cat >'${annotation_tmp}/annotation.input'; echo Annotation added with context \$3 and style \$5, content saved"
+
+  stub docker \
+    "--log-level error run --rm --volume \* --volume \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT='file' --env \* ruby:2.7-alpine ruby /src/bin/annotate /junits : echo '<details>Failure</details>' && exit 64"
 
   run "$PWD/hooks/command"
 
@@ -148,6 +174,31 @@ export annotation_tmp="tests/tmp/junit-annotation"
   unstub buildkite-agent
   unstub du
   unstub mktemp
+}
+
+
+@test "returns an error if fail-build-on-error is true" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=true
+
+  stub mktemp \
+    "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
+    "-d \* : mkdir -p '$annotation_tmp'; echo '$annotation_tmp'"
+
+  stub buildkite-agent \
+    "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
+    "annotate --context \* --style \* : cat >'${annotation_tmp}/annotation.input'; echo Annotation added with context \$3 and style \$5, content saved"
+
+  stub docker \
+    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* ruby:2.7-alpine ruby /src/bin/annotate /junits : echo '<details>Failure</details>' && exit 64"
+
+  run "$PWD/hooks/command"
+
+  assert_failure
+
+  unstub mktemp
+  unstub buildkite-agent
+  unstub docker
 }
 
 @test "returns an error if fail-build-on-error is true and annotation is too large" {
