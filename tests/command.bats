@@ -176,8 +176,8 @@ export annotation_input="tests/tmp/annotation.input"
   assert_output --partial "Failures too large to annotate"
 
   unstub docker
-  unstub buildkite-agent
   unstub du
+  unstub buildkite-agent
   unstub mktemp
 }
 
@@ -230,6 +230,32 @@ export annotation_input="tests/tmp/annotation.input"
   assert_failure
 
   assert_output --partial "Failures too large to annotate"
+
+  unstub mktemp
+  unstub du
+  unstub buildkite-agent
+  unstub docker
+}
+
+@test "error bubbles up when ruby code fails with anything but 64" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=false
+
+  stub mktemp \
+    "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
+    "-d \* : mkdir -p '$annotation_tmp'; echo '$annotation_tmp'"
+
+  stub buildkite-agent \
+    "artifact download \* \* : echo Downloaded artifact \$3 to \$4"
+
+  stub docker \
+    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* ruby:2.7-alpine ruby /src/bin/annotate /junits : echo '<details>Failure</details>' && exit 147"
+
+  run "$PWD/hooks/command"
+
+  assert_failure 147
+
+  assert_output --partial "Error when processing JUnit tests"
 
   unstub mktemp
   unstub buildkite-agent

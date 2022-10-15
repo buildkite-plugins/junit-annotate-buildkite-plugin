@@ -50,14 +50,18 @@ docker \
     ruby:2.7-alpine ruby /src/bin/annotate /junits \
       > "$annotation_path"
 
-if [[ $? -eq 64 ]]; then # special exit code to signal test failures
+exit_code=$?
+set -e
+
+if [[ $exit_code -eq 64 ]]; then # special exit code to signal test failures
   annotation_style="error"
   if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR:-false}" =~ (true|on|1) ]]; then
     fail_build=1
   fi
+elif [[ $exit_code -ne 0 ]]; then
+  echo "🚨 Error when processing JUnit tests"
+  exit $exit_code
 fi
-
-set -e
 
 cat "$annotation_path"
 
