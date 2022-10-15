@@ -3,31 +3,38 @@ require 'open3'
 
 describe "Junit annotate plugin parser" do
   it "handles no failures" do
-    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/no-test-failures/")
+    stdout, stderr, status = Open3.capture3("#{__dir__}/../bin/annotate", "#{__dir__}/no-test-failures/")
 
-    assert_equal <<~OUTPUT, output
+    assert_equal stderr, <<~OUTPUT
       Parsing junit-1.xml
       Parsing junit-2.xml
       Parsing junit-3.xml
       --- ✍️ Preparing annotation
-      8 testcases found
-      There were no failures/errors 🙌
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 0
+      Errors: 0
+      Total tests: 8
     OUTPUT
 
     assert_equal 0, status.exitstatus
   end
 
   it "handles failures across multiple files" do
-    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/two-test-failures/")
+    stdout, stderr, status = Open3.capture3("#{__dir__}/../bin/annotate", "#{__dir__}/two-test-failures/")
 
-    assert_equal <<~OUTPUT, output
+    assert_equal stderr, <<~OUTPUT
       Parsing junit-1.xml
       Parsing junit-2.xml
       Parsing junit-3.xml
       --- ✍️ Preparing annotation
-      6 testcases found
-      There are 4 failures/errors 😭
-      4 failures:
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 4
+      Errors: 0
+      Total tests: 6
       
       <details>
       <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>
@@ -110,17 +117,20 @@ describe "Junit annotate plugin parser" do
   end
 
   it "handles failures and errors across multiple files" do
-    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/test-failure-and-error/")
+    stdout, stderr, status = Open3.capture3("#{__dir__}/../bin/annotate", "#{__dir__}/test-failure-and-error/")
 
-    assert_equal <<~OUTPUT, output
+    assert_equal stderr, <<~OUTPUT
       Parsing junit-1.xml
       Parsing junit-2.xml
       Parsing junit-3.xml
       --- ✍️ Preparing annotation
-      6 testcases found
-      There are 4 failures/errors 😭
-      2 failures and 2 errors:
-      
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 2
+      Errors: 2
+      Total tests: 6
+
       <details>
       <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>
       
@@ -202,14 +212,17 @@ describe "Junit annotate plugin parser" do
   end
 
   it "accepts custom regex filename patterns for job id" do
-    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=junit-(.*)-custom-pattern.xml", "#{__dir__}/../bin/annotate", "#{__dir__}/custom-job-uuid-pattern/")
+    stdout, stderr, status = Open3.capture3("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=junit-(.*)-custom-pattern.xml", "#{__dir__}/../bin/annotate", "#{__dir__}/custom-job-uuid-pattern/")
 
-    assert_equal <<~OUTPUT, output
+    assert_equal stderr, <<~OUTPUT
       Parsing junit-123-456-custom-pattern.xml
       --- ✍️ Preparing annotation
-      2 testcases found
-      There is 1 failure/error 😭
-      1 failure:
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 1
+      Errors: 0
+      Total tests: 2
       
       <details>
       <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>
@@ -235,16 +248,19 @@ describe "Junit annotate plugin parser" do
   end
 
   it "uses the file path instead of classname for annotation content when specified" do
-    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=file", "#{__dir__}/../bin/annotate", "#{__dir__}/test-failure-and-error/")
+    stdout, stderr, status = Open3.capture3("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=file", "#{__dir__}/../bin/annotate", "#{__dir__}/test-failure-and-error/")
 
-    assert_equal <<~OUTPUT, output
+    assert_equal stderr, <<~OUTPUT
       Parsing junit-1.xml
       Parsing junit-2.xml
       Parsing junit-3.xml
       --- ✍️ Preparing annotation
-      6 testcases found
-      There are 4 failures/errors 😭
-      2 failures and 2 errors:
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 2
+      Errors: 2
+      Total tests: 6
 
       <details>
       <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in ./spec/models/account_spec.rb</code></summary>
@@ -327,16 +343,19 @@ describe "Junit annotate plugin parser" do
   end
 
   it "handles failures across multiple files in sub dirs" do
-    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/tests-in-sub-dirs/")
+    stdout, stderr, status = Open3.capture3("#{__dir__}/../bin/annotate", "#{__dir__}/tests-in-sub-dirs/")
 
-    assert_equal <<~OUTPUT, output
+    assert_equal stderr, <<~OUTPUT
       Parsing sub-dir/junit-1.xml
       Parsing sub-dir/junit-2.xml
       Parsing sub-dir/junit-3.xml
       --- ✍️ Preparing annotation
-      6 testcases found
-      There are 4 failures/errors 😭
-      4 failures:
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 4
+      Errors: 0
+      Total tests: 6
       
       <details>
       <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>
@@ -419,14 +438,17 @@ describe "Junit annotate plugin parser" do
   end
 
   it "handles empty failure bodies" do
-    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/empty-failure-body/")
+    stdout, stderr, status = Open3.capture3("#{__dir__}/../bin/annotate", "#{__dir__}/empty-failure-body/")
 
-    assert_equal <<~OUTPUT, output
+    assert_equal stderr, <<~OUTPUT
       Parsing junit.xml
       --- ✍️ Preparing annotation
-      2 testcases found
-      There is 1 failure/error 😭
-      1 failure:
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 1
+      Errors: 0
+      Total tests: 2
 
       <details>
       <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>
@@ -439,15 +461,18 @@ describe "Junit annotate plugin parser" do
     assert_equal 64, status.exitstatus
   end
 
-  it "handles missing message attributes" do
-    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/missing-message-attribute/")
+  it "handles miss message attributes" do
+    stdout, stderr, status = Open3.capture3("#{__dir__}/../bin/annotate", "#{__dir__}/missing-message-attribute/")
 
-    assert_equal <<~OUTPUT, output
+    assert_equal stderr, <<~OUTPUT
       Parsing junit.xml
       --- ✍️ Preparing annotation
-      4 testcases found
-      There are 3 failures/errors 😭
-      1 failure and 2 errors:
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 1
+      Errors: 2
+      Total tests: 4
 
       <details>
       <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>
@@ -469,14 +494,17 @@ describe "Junit annotate plugin parser" do
   end
 
   it "handles cdata formatted XML files" do
-    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/failure-with-cdata/")
+    stdout, stderr, status = Open3.capture3("#{__dir__}/../bin/annotate", "#{__dir__}/failure-with-cdata/")
 
-    assert_equal <<~OUTPUT, output
+    assert_equal stderr, <<~OUTPUT
       Parsing junit.xml
       --- ✍️ Preparing annotation
-      2 testcases found
-      There is 1 failure/error 😭
-      1 error:
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 0
+      Errors: 1
+      Total tests: 2
 
       <details>
       <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>
@@ -493,16 +521,21 @@ describe "Junit annotate plugin parser" do
   end
 
   it "reports specified amount of slowest tests" do
-    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=5", "#{__dir__}/../bin/annotate", "#{__dir__}/no-test-failures/")
+    stdout, stderr, status = Open3.capture3("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=5", "#{__dir__}/../bin/annotate", "#{__dir__}/no-test-failures/")
 
-    assert_equal <<~OUTPUT, output
+    assert_equal stderr, <<~OUTPUT
       Parsing junit-1.xml
       Parsing junit-2.xml
       Parsing junit-3.xml
       --- ✍️ Preparing annotation
-      8 testcases found
-      There were no failures/errors 🙌
       Reporting slowest tests ⏱
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 0
+      Errors: 0
+      Total tests: 8
+      
       <details>
       <summary>5 slowest tests</summary>
 
@@ -523,13 +556,17 @@ describe "Junit annotate plugin parser" do
   end
 
   it "handles junit dir paths with hidden directories" do
-    output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/.tests-in-hidden-dir/")
+    stdout, stderr, status = Open3.capture3("#{__dir__}/../bin/annotate", "#{__dir__}/.tests-in-hidden-dir/")
 
-    assert_equal <<~OUTPUT, output
+    assert_equal stderr, <<~OUTPUT
       Parsing junit-1.xml
       --- ✍️ Preparing annotation
-      2 testcases found
-      There were no failures/errors 🙌
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 0
+      Errors: 0
+      Total tests: 2
     OUTPUT
 
     assert_equal 0, status.exitstatus

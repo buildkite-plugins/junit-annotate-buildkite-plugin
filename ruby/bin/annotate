@@ -81,9 +81,9 @@ errors_count = failures.select {|f| f.type == :error }.length
 puts "Failures: #{failures_count}"
 puts "Errors: #{errors_count}"
 puts "Total tests: #{testcases}"
-puts "\n"
 
 failures.each do |failure|
+  puts ""
   puts "<details>"
   puts "<summary><code>#{failure.name} in #{failure.unit_name}</code></summary>\n\n"
   if failure.message
@@ -96,12 +96,11 @@ failures.each do |failure|
     puts "in <a href=\"##{failure.job}\">Job ##{failure.job}</a>"
   end
   puts "</details>"
-  puts "" unless failure == failures.last
 end
 
 if report_slowest > 0
   STDERR.puts "Reporting slowest tests ⏱"
-
+  puts ""
   puts "<details>"
   puts "<summary>#{report_slowest} slowest tests</summary>\n\n"
   puts "<table>"
