@@ -10,7 +10,7 @@ load "${BATS_PLUGIN_PATH}/load.bash"
 
 export artifacts_tmp="tests/tmp/junit-artifacts"
 export annotation_tmp="tests/tmp/junit-annotation"
-
+export annotation_input="tests/tmp/annotation.input"
 
 @test "runs the annotator and creates the annotation" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
@@ -22,7 +22,7 @@ export annotation_tmp="tests/tmp/junit-annotation"
 
   stub buildkite-agent \
     "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
-    "annotate --context \* --style \* : cat >'${annotation_tmp}/annotation.input'; echo Annotation added with context \$3 and style \$5, content saved"
+    "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
     "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* ruby:2.7-alpine ruby /src/bin/annotate /junits : echo '<details>Failure</details>' && exit 64"
@@ -32,10 +32,12 @@ export annotation_tmp="tests/tmp/junit-annotation"
   assert_success
 
   assert_output --partial "Annotation added with context junit and style error"
-  
+  assert_equal "$(cat "${annotation_input}")" '<details>Failure</details>'
+
   unstub mktemp
   unstub buildkite-agent
   unstub docker
+  rm "${annotation_input}"
 }
 
 
@@ -49,7 +51,7 @@ export annotation_tmp="tests/tmp/junit-annotation"
 
   stub buildkite-agent \
     "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
-    "annotate --context \* --style \* : cat >'${annotation_tmp}/annotation.input'; echo Annotation added with context \$3 and style \$5, content saved"
+    "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
     "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* ruby:2.7-alpine ruby /src/bin/annotate /junits : echo '<details>Failure</details>' && exit 64"
@@ -63,6 +65,7 @@ export annotation_tmp="tests/tmp/junit-annotation"
   unstub mktemp
   unstub buildkite-agent
   unstub docker
+  rm "${annotation_input}"
 }
 @test "can pass through optional job uuid file pattern" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
@@ -74,7 +77,7 @@ export annotation_tmp="tests/tmp/junit-annotation"
 
   stub buildkite-agent \
     "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
-    "annotate --context \* --style \* : cat >'${annotation_tmp}/annotation.input'; echo Annotation added with context \$3 and style \$5, content saved"
+    "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
     "--log-level error run --rm --volume \* --volume \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN='custom_(*)_pattern.xml' --env \* --env \* ruby:2.7-alpine ruby /src/bin/annotate /junits : echo '<details>Failure</details>' && exit 64"
@@ -88,11 +91,11 @@ export annotation_tmp="tests/tmp/junit-annotation"
   unstub mktemp
   unstub buildkite-agent
   unstub docker
+  rm "${annotation_input}"
 }
 
 @test "can pass through optional failure format" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
-  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT="junit_custom_context"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT="file"
 
   stub mktemp \
@@ -101,7 +104,7 @@ export annotation_tmp="tests/tmp/junit-annotation"
 
   stub buildkite-agent \
     "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
-    "annotate --context \* --style \* : cat >'${annotation_tmp}/annotation.input'; echo Annotation added with context \$3 and style \$5, content saved"
+    "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
     "--log-level error run --rm --volume \* --volume \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT='file' --env \* ruby:2.7-alpine ruby /src/bin/annotate /junits : echo '<details>Failure</details>' && exit 64"
@@ -115,6 +118,7 @@ export annotation_tmp="tests/tmp/junit-annotation"
   unstub mktemp
   unstub buildkite-agent
   unstub docker
+  rm "${annotation_input}"
 }
 
 @test "doesn't create annotation unless there's failures" {
@@ -187,7 +191,7 @@ export annotation_tmp="tests/tmp/junit-annotation"
 
   stub buildkite-agent \
     "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
-    "annotate --context \* --style \* : cat >'${annotation_tmp}/annotation.input'; echo Annotation added with context \$3 and style \$5, content saved"
+    "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
     "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* ruby:2.7-alpine ruby /src/bin/annotate /junits : echo '<details>Failure</details>' && exit 64"
@@ -199,6 +203,7 @@ export annotation_tmp="tests/tmp/junit-annotation"
   unstub mktemp
   unstub buildkite-agent
   unstub docker
+  rm "${annotation_input}"
 }
 
 @test "returns an error if fail-build-on-error is true and annotation is too large" {
