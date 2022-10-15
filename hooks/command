@@ -10,8 +10,6 @@ fi
 PLUGIN_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)/.."
 MAX_SIZE=1024 # in KB
 
-echo "--- :junit: Download the junits"
-
 artifacts_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX")"
 annotation_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-annotation-tmp.XXXXXXXXXX")"
 annotation_path="${annotation_dir}/annotation.md"
@@ -31,9 +29,11 @@ function check_size {
 
 trap cleanup EXIT
 
-buildkite-agent artifact download \
-  "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS}" \
-  "$artifacts_dir"
+echo "--- :junit: Download the junits"
+if ! buildkite-agent artifact download "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS}" "$artifacts_dir"; then
+  echo "--- :boom: Could not download artifacts"
+  exit 2
+fi
 
 echo "--- :junit: Processing the junits"
 
@@ -59,7 +59,7 @@ if [[ $exit_code -eq 64 ]]; then # special exit code to signal test failures
     fail_build=1
   fi
 elif [[ $exit_code -ne 0 ]]; then
-  echo "🚨 Error when processing JUnit tests"
+  echo "--- :boom: Error when processing JUnit tests"
   exit $exit_code
 fi
 

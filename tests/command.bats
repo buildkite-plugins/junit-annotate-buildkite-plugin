@@ -261,3 +261,26 @@ export annotation_input="tests/tmp/annotation.input"
   unstub buildkite-agent
   unstub docker
 }
+
+
+
+@test "error bubbles up when agent download fails" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=false
+
+  stub mktemp \
+    "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
+    "-d \* : mkdir -p '$annotation_tmp'; echo '$annotation_tmp'"
+
+  stub buildkite-agent \
+    "artifact download \* \* : exit 1"
+
+  run "$PWD/hooks/command"
+
+  assert_failure 2
+
+  assert_output --partial "Could not download artifacts"
+
+  unstub mktemp
+  unstub buildkite-agent
+}
