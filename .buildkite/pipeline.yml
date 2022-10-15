@@ -1,11 +1,11 @@
 steps:
   - label: ":bash: Plugin"
     plugins:
-      docker-compose#v4.1.1:
+      docker-compose#v4.2.0:
         run: plugin
   - label: ":ruby: Ruby"
     plugins:
-      docker-compose#v4.1.1:
+      docker-compose#v4.2.0:
         run: ruby
   - label: "✨ Lint"
     plugins:
