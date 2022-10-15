@@ -148,7 +148,8 @@ export annotation_input="tests/tmp/annotation.input"
 
   assert_failure
 
-  assert_output --partial "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS: unbound variable"
+  assert_output --partial "Missing artifacts configuration for the plugin"
+  refute_output --partial ":junit:"
 }
 
 @test "fails if the annotation is larger than 1MB" {
