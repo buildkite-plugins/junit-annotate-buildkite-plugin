@@ -74,36 +74,29 @@ junit_report_files.sort.each do |file|
 end
 
 STDERR.puts "--- ✍️ Preparing annotation"
-STDERR.puts "#{testcases} testcases found"
 
-if failures.any?
-  STDERR.puts "There #{failures.length == 1 ? "is 1 failure/error" : "are #{failures.length} failures/errors" } 😭"
+failures_count = failures.select {|f| f.type == :failure }.length
+errors_count = failures.select {|f| f.type == :error }.length
 
-  failures_count = failures.select {|f| f.type == :failure }.length
-  errors_count = failures.select {|f| f.type == :error }.length
-  puts [
-    failures_count == 0 ? nil : (failures_count == 1 ? "1 failure" : "#{failures_count} failures"),
-    errors_count === 0 ? nil : (errors_count == 1 ? "1 error" : "#{errors_count} errors"),
-  ].compact.join(" and ") + ":\n\n"
+puts "Failures: #{failures_count}"
+puts "Errors: #{errors_count}"
+puts "Total tests: #{testcases}"
+puts "\n"
 
-  failures.each do |failure|
-    puts "<details>"
-    puts "<summary><code>#{failure.name} in #{failure.unit_name}</code></summary>\n\n"
-    if failure.message
-      puts "<p>#{failure.message.chomp.strip}</p>\n\n"
-    end
-    if failure.body
-      puts "<pre><code>#{CGI.escapeHTML(failure.body.chomp.strip)}</code></pre>\n\n"
-    end
-    if failure.job
-      puts "in <a href=\"##{failure.job}\">Job ##{failure.job}</a>"
-    end
-    puts "</details>"
-    puts "" unless failure == failures.last
+failures.each do |failure|
+  puts "<details>"
+  puts "<summary><code>#{failure.name} in #{failure.unit_name}</code></summary>\n\n"
+  if failure.message
+    puts "<p>#{failure.message.chomp.strip}</p>\n\n"
   end
-
-else
-  STDERR.puts "There were no failures/errors 🙌"
+  if failure.body
+    puts "<pre><code>#{CGI.escapeHTML(failure.body.chomp.strip)}</code></pre>\n\n"
+  end
+  if failure.job
+    puts "in <a href=\"##{failure.job}\">Job ##{failure.job}</a>"
+  end
+  puts "</details>"
+  puts "" unless failure == failures.last
 end
 
 if report_slowest > 0
