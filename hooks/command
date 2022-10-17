@@ -78,8 +78,19 @@ if [ $has_errors -eq 0 ]; then
   fi
 elif ! check_size; then
   echo "--- :warning: Failures too large to annotate"
-  echo "The failures are too large to create a build annotation. Please inspect the failed JUnit artifacts manually."
-  create_annotation=0
+
+  # creating a simplified version of the annotation
+  mv "${annotation_path}" "${annotation_path}2"
+  head -4 "${annotation_path}2" >"${annotation_path}"
+  # || true is to avoid issues if no summary is found
+  grep '<summary>' "${annotation_path}2" >>"${annotation_path}" || true
+
+  if ! check_size; then
+    echo "The failures are too large to create a build annotation. Please inspect the failed JUnit artifacts manually."
+    create_annotation=0
+  else
+    echo "The failures are too large to create complete annotation, using a simplified annotation"
+  fi
 fi
 
 if [ $create_annotation -ne 0 ]; then
