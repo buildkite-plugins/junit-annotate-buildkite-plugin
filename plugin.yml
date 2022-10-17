@@ -7,7 +7,7 @@ configuration:
   properties:
     artifacts:
       type: string
-    allways-annotate:
+    always-annotate:
       type: boolean
     context:
       type: string

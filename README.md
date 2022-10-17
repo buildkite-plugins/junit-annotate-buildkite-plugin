@@ -26,7 +26,7 @@ The artifact glob path to find the JUnit XML files.
 
 Example: `tmp/junit-*.xml`
 
-### `allways-annotate` (optional, boolean)
+### `always-annotate` (optional, boolean)
 
 Forces the creation of the annotation even when no failures or errors are found
 
