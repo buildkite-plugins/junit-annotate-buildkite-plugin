@@ -61,6 +61,11 @@ Default: `0`
 
 Include the specified number of slowest tests in the annotation. The annotation will always be shown.
 
+### `max-failures-reported` (optional)
+Default: `0`
+
+Include the specified number of slowest tests in the annotation. The annotation will always be shown.
+
 ## Developing
 
 To test the plugin hooks (in Bash) and the junit parser (in Ruby):

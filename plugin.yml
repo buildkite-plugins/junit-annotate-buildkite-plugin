@@ -20,6 +20,8 @@ configuration:
       type: string
     report-slowest:
       type: integer
+    max-failures-reported:
+      type: integer
   required:
     - artifacts
   additionalProperties: false

@@ -19,6 +19,8 @@ failure_format = 'classname' if !failure_format || failure_format.empty?
 
 report_slowest = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST'].to_i
 
+max_failures_reported = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MAX_FAILURES_REPORTED'].to_i
+
 class Failure < Struct.new(:name, :unit_name, :body, :job, :type, :message)
 end
 
@@ -85,7 +87,8 @@ if failures.any?
     failures_count == 0 ? nil : (failures_count == 1 ? "1 failure" : "#{failures_count} failures"),
     errors_count === 0 ? nil : (errors_count == 1 ? "1 error" : "#{errors_count} errors"),
   ].compact.join(" and ") + ":\n\n"
-
+  original_failure_length = failures.length
+  failures = failures.take(max_failures_reported) unless max_failures_reported == 0
   failures.each do |failure|
     puts "<details>"
     puts "<summary><code>#{failure.name} in #{failure.unit_name}</code></summary>\n\n"
@@ -100,6 +103,12 @@ if failures.any?
     end
     puts "</details>"
     puts "" unless failure == failures.last
+  end
+  if original_failure_length > max_failures_reported and max_failures_reported > 0
+    puts(
+      "\n#{original_failure_length - max_failures_reported} more failures/errors present, but unreported due to max " \
+      "failures reported value of #{max_failures_reported}"
+    )
   end
 
 else

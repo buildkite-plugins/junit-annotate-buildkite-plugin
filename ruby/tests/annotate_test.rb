@@ -17,6 +17,21 @@ describe "Junit annotate plugin parser" do
     assert_equal 0, status.exitstatus
   end
 
+  it "handles no failures even with max failure set" do
+    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MAX_FAILURES_REPORTED=1", "#{__dir__}/../bin/annotate", "#{__dir__}/no-test-failures/")
+
+    assert_equal <<~OUTPUT, output
+      Parsing junit-1.xml
+      Parsing junit-2.xml
+      Parsing junit-3.xml
+      --- ✍️ Preparing annotation
+      8 testcases found
+      There were no failures/errors 🙌
+    OUTPUT
+
+    assert_equal 0, status.exitstatus
+  end
+
   it "handles failures across multiple files" do
     output, status = Open3.capture2e("#{__dir__}/../bin/annotate", "#{__dir__}/two-test-failures/")
 
@@ -196,6 +211,62 @@ describe "Junit annotate plugin parser" do
       
       in <a href="#3">Job #3</a>
       </details>
+    OUTPUT
+
+    assert_equal 64, status.exitstatus
+  end
+
+  it "handles failures and errors across multiple files with max failures reported set" do
+    output, status = Open3.capture2e("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MAX_FAILURES_REPORTED=2", "#{__dir__}/../bin/annotate", "#{__dir__}/test-failure-and-error/")
+
+    assert_equal <<~OUTPUT, output
+      Parsing junit-1.xml
+      Parsing junit-2.xml
+      Parsing junit-3.xml
+      --- ✍️ Preparing annotation
+      6 testcases found
+      There are 4 failures/errors 😭
+      2 failures and 2 errors:
+      
+      <details>
+      <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>
+      
+      <p>expected: 250 got: 500 (compared using eql?)</p>
+
+      <pre><code>Failure/Error: expect(account.maximum_jobs_added_by_pipeline_changer).to eql(250)
+      
+        expected: 250
+             got: 500
+      
+        (compared using eql?)
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
+      
+      in <a href="#1">Job #1</a>
+      </details>
+      
+      <details>
+      <summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 700 if the account is XYZ in spec.models.account_spec</code></summary>
+      
+      <p>expected: 700 got: 500 (compared using eql?)</p>
+
+      <pre><code>Failure/Error: expect(account.maximum_jobs_added_by_pipeline_changer).to eql(250)
+      
+        expected: 700
+             got: 500
+      
+        (compared using eql?)
+      ./spec/models/account_spec.rb:78:in `block (3 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/database.rb:16:in `block (2 levels) in &lt;top (required)&gt;&#39;
+      ./spec/support/log.rb:17:in `run&#39;
+      ./spec/support/log.rb:66:in `block (2 levels) in &lt;top (required)&gt;&#39;</code></pre>
+      
+      in <a href="#2">Job #2</a>
+      </details>
+
+      2 more failures/errors present, but unreported due to max failures reported value of 2
     OUTPUT
 
     assert_equal 64, status.exitstatus
