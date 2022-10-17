@@ -15,6 +15,8 @@ annotation_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-annotation-tmp.XXXXXXX
 annotation_path="${annotation_dir}/annotation.md"
 annotation_style="info"
 fail_build=0
+has_errors=0
+create_annotation=0
 
 function cleanup {
   rm -rf "${artifacts_dir}"
@@ -54,8 +56,11 @@ exit_code=$?
 set -e
 
 if [[ $exit_code -eq 64 ]]; then # special exit code to signal test failures
+  has_errors=1
+  create_annotation=1
   annotation_style="error"
   if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR:-false}" =~ (true|on|1) ]]; then
+    echo "--- :boom: Build will fail due to errors being found"
     fail_build=1
   fi
 elif [[ $exit_code -ne 0 ]]; then
@@ -65,21 +70,33 @@ fi
 
 cat "$annotation_path"
 
-if grep -q "<details>" "$annotation_path"; then
+if [ $has_errors -eq 0 ]; then
+  # done in nested if to simplify outer conditions
+  if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ALWAYS_ANNOTATE:-false}" =~ (true|on|1) ]]; then
+    echo "Will create annotation anyways"
+    create_annotation=1
+  fi
+elif ! check_size; then
+  echo "--- :warning: Failures too large to annotate"
+
+  # creating a simplified version of the annotation
+  mv "${annotation_path}" "${annotation_path}2"
+  head -4 "${annotation_path}2" >"${annotation_path}"
+  # || true is to avoid issues if no summary is found
+  grep '<summary>' "${annotation_path}2" >>"${annotation_path}" || true
+
   if ! check_size; then
-    echo "--- :warning: Failures too large to annotate"
-    msg="The failures are too large to create a build annotation. Please inspect the failed JUnit artifacts manually."
-    echo "$msg"
+    echo "The failures are too large to create a build annotation. Please inspect the failed JUnit artifacts manually."
+    create_annotation=0
   else
-    echo "--- :buildkite: Creating annotation"
-    # shellcheck disable=SC2002
-    cat "$annotation_path" | buildkite-agent annotate --context "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT:-junit}" --style "$annotation_style"
+    echo "The failures are too large to create complete annotation, using a simplified annotation"
   fi
 fi
 
-if ((fail_build)); then
-  echo "--- :boom: Failing build due to error"
-  exit 1
-else
-  exit 0
+if [ $create_annotation -ne 0 ]; then
+  echo "--- :buildkite: Creating annotation"
+  # shellcheck disable=SC2002
+  cat "$annotation_path" | buildkite-agent annotate --context "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT:-junit}" --style "$annotation_style"
 fi
+
+exit $fail_build

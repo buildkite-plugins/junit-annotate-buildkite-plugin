@@ -7,7 +7,9 @@ configuration:
   properties:
     artifacts:
       type: string
-    job-uuid-file-pattern:
+    always-annotate:
+      type: boolean
+    context:
       type: string
     failure-format:
       type: string
@@ -16,7 +18,7 @@ configuration:
         - file
     fail-build-on-error:
       type: boolean
-    context:
+    job-uuid-file-pattern:
       type: string
     report-slowest:
       type: integer
