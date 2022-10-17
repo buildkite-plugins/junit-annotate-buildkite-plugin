@@ -73,6 +73,7 @@ cat "$annotation_path"
 if [ $has_errors -eq 0 ]; then
   # done in nested if to simplify outer conditions
   if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ALWAYS_ANNOTATE:-false}" =~ (true|on|1) ]]; then
+    echo "Will create annotation anyways"
     create_annotation=1
   fi
 elif ! check_size; then

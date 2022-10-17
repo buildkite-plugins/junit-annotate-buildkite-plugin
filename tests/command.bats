@@ -40,7 +40,6 @@ export annotation_input="tests/tmp/annotation.input"
   rm "${annotation_input}"
 }
 
-
 @test "can define a special context" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT="junit_custom_context"
@@ -67,6 +66,7 @@ export annotation_input="tests/tmp/annotation.input"
   unstub docker
   rm "${annotation_input}"
 }
+
 @test "can pass through optional job uuid file pattern" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN="custom_(*)_pattern.xml"
@@ -137,6 +137,32 @@ export annotation_input="tests/tmp/annotation.input"
   run "$PWD/hooks/command"
 
   assert_success
+
+  unstub mktemp
+  unstub buildkite-agent
+  unstub docker
+}
+
+@test "creates annotation with no failures but always annotate" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ALWAYS_ANNOTATE=1
+
+  stub mktemp \
+    "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
+    "-d \* : mkdir -p '$annotation_tmp'; echo '$annotation_tmp'"
+
+  stub buildkite-agent \
+    "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
+    "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
+
+  stub docker \
+    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* ruby:2.7-alpine ruby /src/bin/annotate /junits : echo No test errors"
+
+  run "$PWD/hooks/command"
+
+  assert_success
+  assert_output --partial "No tests errors"
+  assert_output --partial "Will create annotation anyways"
 
   unstub mktemp
   unstub buildkite-agent
@@ -261,8 +287,6 @@ export annotation_input="tests/tmp/annotation.input"
   unstub buildkite-agent
   unstub docker
 }
-
-
 
 @test "error bubbles up when agent download fails" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
