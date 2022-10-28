@@ -86,7 +86,7 @@ if [ $has_errors -eq 0 ]; then
   if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MIN_TESTS:-0}" -gt "${TOTAL_TESTS}" ]]; then
     create_annotation=1
     fail_build=1
-    echo ":warning: Less than ${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MIN_TESTS} tests run"
+    echo ":warning: Less than ${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MIN_TESTS} tests analyzed"
   fi
 elif ! check_size; then
   echo "--- :warning: Failures too large to annotate"
