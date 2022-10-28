@@ -9,6 +9,7 @@ fi
 
 PLUGIN_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)/.."
 MAX_SIZE=1024 # in KB
+RUBY_IMAGE="${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUBY_IMAGE:-'ruby:3.1-alpine@sha256:a39e26d0598837f08c75a42c8b0886d9ed5cc862c4b535662922ee1d05272fca'}"
 
 artifacts_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX")"
 annotation_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-annotation-tmp.XXXXXXXXXX")"
@@ -49,7 +50,7 @@ docker \
     --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}" \
     --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT:-}" \
     --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST:-}" \
-    ruby:2.7-alpine ruby /src/bin/annotate /junits \
+    "${RUBY_IMAGE}" ruby /src/bin/annotate /junits \
       > "$annotation_path"
 
 exit_code=$?
