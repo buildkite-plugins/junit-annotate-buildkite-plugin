@@ -20,6 +20,8 @@ configuration:
       type: boolean
     job-uuid-file-pattern:
       type: string
+    min-tests:
+      type: integer
     report-slowest:
       type: integer
     ruby-image:
