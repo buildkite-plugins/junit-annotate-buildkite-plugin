@@ -70,6 +70,12 @@ Default: `0`
 
 Include the specified number of slowest tests in the annotation. The annotation will always be shown.
 
+### `ruby-image` (optional)
+
+The docker image to use for running the analysis code. Must be a valid image reference that can run the corresponding ruby code and the agent running the step must be able to pull it if not already present.
+
+Default: `ruby:3.1-alpine@sha256:a39e26d0598837f08c75a42c8b0886d9ed5cc862c4b535662922ee1d05272fca`
+
 ## Developing
 
 To test the plugin hooks (in Bash) and the junit parser (in Ruby):

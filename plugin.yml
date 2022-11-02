@@ -24,6 +24,8 @@ configuration:
       type: integer
     report-slowest:
       type: integer
+    ruby-image:
+      type: string
   required:
     - artifacts
   additionalProperties: false
