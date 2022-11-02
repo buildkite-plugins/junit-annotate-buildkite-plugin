@@ -31,6 +31,7 @@ Example: `tmp/junit-*.xml`
 Forces the creation of the annotation even when no failures or errors are found
 
 ### `job-uuid-file-pattern` (optional)
+
 Default: `-(.*).xml`
 
 The regular expression (with capture group) that matches the job UUID in the junit file names. This is used to create the job links in the annotation.
@@ -38,32 +39,43 @@ The regular expression (with capture group) that matches the job UUID in the jun
 To use this, configure your test reporter to embed the `$BUILDKITE_JOB_ID` environment variable into your junit file names. For example `"junit-buildkite-job-$BUILDKITE_JOB_ID.xml"`.
 
 ### `failure-format` (optional)
+
 Default: `classname`
 
 This setting controls the format of your failed test in the main annotation summary.
 
 There are two options for this:
-* `classname`
-  * displays: `MyClass::UnderTest text of the failed expectation in path.to.my_class.under_test`
-* `file`
-  * displays: `MyClass::UnderTest text of the failed expectation in path/to/my_class/under_test.file_ext`
 
-### `fail-build-on-error` (optional)  
+- `classname`
+  - displays: `MyClass::UnderTest text of the failed expectation in path.to.my_class.under_test`
+- `file`
+  - displays: `MyClass::UnderTest text of the failed expectation in path/to/my_class/under_test.file_ext`
+
+### `fail-build-on-error` (optional)
+
 Default: `false`
 
 If this setting is true and any errors are found in the JUnit XML files during
-parsing, the annotation step will exit with a non-zero value, which should cause 
+parsing, the annotation step will exit with a non-zero value, which should cause
 the build to fail.
 
 ### `context` (optional)
+
 Default: `junit`
 
 The buildkite annotation context to use. Useful to differentiate multiple runs of this plugin in a single pipeline.
 
 ### `report-slowest` (optional)
+
 Default: `0`
 
 Include the specified number of slowest tests in the annotation. The annotation will always be shown.
+
+### `continue-without-junit-files` (optional)
+
+Default: `false`
+
+If this is set to `true` and test files are **not** found during download, the plugin will exit with a code of `0` and allow the build to continue, rather than marking the build as `failed` where test files are not found.
 
 ## Developing
 

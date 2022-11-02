@@ -32,9 +32,17 @@ function check_size {
 trap cleanup EXIT
 
 echo "--- :junit: Download the junits"
+if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTINUE_WITHOUT_JUNIT_FILES:-false}" =~ (true|on|1) ]]; then
+  echo "--- :boom: If no files are found, the build will continue."
+  fail_build=0
+else
+  echo "--- :boom: If no files are found, the build will fail."
+  fail_build=2
+fi
+
 if ! buildkite-agent artifact download "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS}" "$artifacts_dir"; then
   echo "--- :boom: Could not download artifacts"
-  exit 2
+  exit $fail_build
 fi
 
 echo "--- :junit: Processing the junits"

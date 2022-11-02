@@ -22,6 +22,8 @@ configuration:
       type: string
     report-slowest:
       type: integer
+    continue-without-junit-files:
+      type: boolean
   required:
     - artifacts
   additionalProperties: false
