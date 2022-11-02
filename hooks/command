@@ -84,6 +84,18 @@ if [ $has_errors -eq 0 ]; then
     echo "Will create annotation anyways"
     create_annotation=1
   fi
+  
+  if [[ -e "${annotation_path}" ]]; then
+    TOTAL_TESTS=$(head -4 "${annotation_path}" | grep 'Total tests' | cut -d\  -f3)
+  else
+    TOTAL_TESTS=0
+  fi
+
+  if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MIN_TESTS:-0}" -gt "${TOTAL_TESTS}" ]]; then
+    create_annotation=1
+    fail_build=1
+    echo ":warning: Less than ${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MIN_TESTS} tests analyzed"
+  fi
 elif ! check_size; then
   echo "--- :warning: Failures too large to annotate"
 

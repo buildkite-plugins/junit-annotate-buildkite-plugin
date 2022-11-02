@@ -14,7 +14,7 @@ steps:
   - wait: ~
     continue_on_failure: true
   - plugins:
-      - junit-annotate#v2.1.0:
+      - junit-annotate#v2.2.0:
           artifacts: tmp/junit-*.xml
 ```
 
@@ -29,6 +29,12 @@ Example: `tmp/junit-*.xml`
 ### `always-annotate` (optional, boolean)
 
 Forces the creation of the annotation even when no failures or errors are found
+
+### `context` (optional)
+
+Default: `junit`
+
+The buildkite annotation context to use. Useful to differentiate multiple runs of this plugin in a single pipeline.
 
 ### `job-uuid-file-pattern` (optional)
 
@@ -63,7 +69,7 @@ the build to fail.
 
 Default: `junit`
 
-The buildkite annotation context to use. Useful to differentiate multiple runs of this plugin in a single pipeline.
+Minimum amount of run tests that need to be analyzed or a failure will be reported. It is useful to ensure that tests are actually run and report files to analyze do contain information.
 
 ### `report-slowest` (optional)
 
@@ -99,7 +105,7 @@ To test your plugin in your builds prior to opening a pull request, you can refe
 steps:
   - label: Annotate
     plugins:
-      - YourGithubHandle/junit-annotate#v2.1.0:
+      - YourGithubHandle/junit-annotate#v2.2.0:
           ...
 ```
 
