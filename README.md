@@ -60,6 +60,12 @@ Default: `false`
 
 If this setting is true and any errors are found in the JUnit XML files during parsing, the annotation step will exit with a non-zero value, which should cause the build to fail.
 
+### `failed-download-exit-code` (optional, integer)
+
+Default: `2`
+
+Exit code of the plugin if the call to `buildkite-agent artifact download` fails.
+
 ### `min-tests` (optional, integer)
 
 Minimum amount of run tests that need to be analyzed or a failure will be reported. It is useful to ensure that tests are actually run and report files to analyze do contain information.

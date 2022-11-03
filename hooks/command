@@ -35,7 +35,7 @@ trap cleanup EXIT
 echo "--- :junit: Download the junits"
 if ! buildkite-agent artifact download "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS}" "$artifacts_dir"; then
   echo "--- :boom: Could not download artifacts"
-  exit 2
+  exit "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILED_DOWNLOAD_EXIT_CODE:-2}"
 fi
 
 echo "--- :junit: Processing the junits"
