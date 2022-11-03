@@ -346,6 +346,27 @@ export annotation_input="tests/tmp/annotation.input"
   unstub buildkite-agent
 }
 
+@test "customize error when agent download fails" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILED_DOWNLOAD_EXIT_CODE=5
+
+  stub mktemp \
+    "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
+    "-d \* : mkdir -p '$annotation_tmp'; echo '$annotation_tmp'"
+
+  stub buildkite-agent \
+    "artifact download \* \* : exit 1"
+
+  run "$PWD/hooks/command"
+
+  assert_failure 5
+
+  assert_output --partial "Could not download artifacts"
+
+  unstub mktemp
+  unstub buildkite-agent
+}
+
 @test "creates annotation with no failures but min tests triggers" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MIN_TESTS=1

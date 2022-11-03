@@ -14,7 +14,7 @@ steps:
   - wait: ~
     continue_on_failure: true
   - plugins:
-      - junit-annotate#v2.2.0:
+      - junit-annotate#v2.4.0:
           artifacts: tmp/junit-*.xml
 ```
 
@@ -59,6 +59,12 @@ There are two options for this:
 Default: `false`
 
 If this setting is true and any errors are found in the JUnit XML files during parsing, the annotation step will exit with a non-zero value, which should cause the build to fail.
+
+### `failed-download-exit-code` (optional, integer)
+
+Default: `2`
+
+Exit code of the plugin if the call to `buildkite-agent artifact download` fails.
 
 ### `min-tests` (optional, integer)
 

@@ -18,6 +18,8 @@ configuration:
         - file
     fail-build-on-error:
       type: boolean
+    failed-download-exit-code:
+      type: integer
     job-uuid-file-pattern:
       type: string
     min-tests:
