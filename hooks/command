@@ -19,6 +19,7 @@ fail_build=0
 has_errors=0
 create_annotation=0
 
+# shellcheck disable=2317  #  this is a signal function
 function cleanup {
   rm -rf "${artifacts_dir}"
   rm -rf "${annotation_dir}"
