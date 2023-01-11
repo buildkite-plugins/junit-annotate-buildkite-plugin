@@ -1,7 +1,7 @@
 version: '2'
 services:
   plugin:
-    image: buildkite/plugin-tester:v3.0.1
+    image: buildkite/plugin-tester:v4.0.0
     volumes:
       - ".:/plugin"
     depends_on:
