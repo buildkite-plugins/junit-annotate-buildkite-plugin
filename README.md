@@ -84,18 +84,22 @@ Default: `ruby:3.1-alpine@sha256:a39e26d0598837f08c75a42c8b0886d9ed5cc862c4b5356
 
 ## Developing
 
-To test the plugin hooks (in Bash) and the junit parser (in Ruby):
+To run testing, shellchecks and plugin linting use use `bk run` with the [Buildkite CLI](https://github.com/buildkite/cli).
 
 ```bash
-docker-compose run --rm plugin &&
-docker-compose run --rm ruby
+bk run
 ```
 
-To test the Ruby parser locally:
+Or if you want to run just the plugin tests, you can use the docker [Plugin Tester](https://github.com/buildkite-plugins/buildkite-plugin-tester):
 
 ```bash
-cd ruby
-rake
+docker run --rm -ti -v "${PWD}":/plugin buildkite/plugin-tester:latest
+```
+
+To test the Ruby code with `rake` in docker:
+
+```bash
+docker-compose run --rm ruby
 ```
 
 To test your plugin in your builds prior to opening a pull request, you can refer to your fork and SHA from a branch in your `pipeline.yml`.
