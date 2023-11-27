@@ -85,9 +85,9 @@ puts "Total tests: #{testcases}"
 failures.each do |failure|
   puts ""
   puts "<details>"
-  puts "<summary><code>#{failure.name} in #{failure.unit_name}</code></summary>\n\n"
+  puts "<summary><code>#{CGI.escapeHTML failure.name} in #{CGI.escapeHTML failure.unit_name}</code></summary>\n\n"
   if failure.message
-    puts "<p>#{failure.message.chomp.strip}</p>\n\n"
+    puts "<p>#{CGI.escapeHTML failure.message.chomp.strip}</p>\n\n"
   end
   if failure.body
     puts "<pre><code>#{CGI.escapeHTML(failure.body.chomp.strip)}</code></pre>\n\n"
