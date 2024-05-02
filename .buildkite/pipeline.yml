@@ -1,19 +1,27 @@
 steps:
   - label: ":bash: Plugin"
+    agents:
+      queue: "hosted"
     plugins:
       - plugin-tester#v1.1.1: ~
 
   - label: ":ruby: Ruby"
+    agents:
+      queue: "hosted"
     plugins:
       - docker-compose#v5.2.0:
           run: ruby
 
   - label: "✨ Lint"
+    agents:
+      queue: "hosted"
     plugins:
       - plugin-linter#v3.3.0:
           id: junit-annotate
 
   - label: ":bash: Shellcheck"
+    agents:
+      queue: "hosted"
     plugins:
       - shellcheck#v1.3.0:
           files: hooks/*
