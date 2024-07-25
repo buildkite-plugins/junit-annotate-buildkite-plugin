@@ -27,6 +27,7 @@ end
 
 junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"), File::FNM_DOTMATCH)
 testcases = 0
+skipped = 0
 failures = []
 timings = []
 
@@ -70,6 +71,9 @@ junit_report_files.sort.each do |file|
     testcase.elements.each("error") do |error|
       failures << Failure.new(name, unit_name, text_content(error), job, :error, message_content(error))
     end
+    testcase.elements.each("skipped") do |skip|
+      skipped += 1
+    end
   end
 end
 
@@ -80,6 +84,7 @@ errors_count = failures.select {|f| f.type == :error }.length
 
 puts "Failures: #{failures_count}"
 puts "Errors: #{errors_count}"
+puts "Skipped: #{skipped}"
 puts "Total tests: #{testcases}"
 
 failures.each do |failure|
