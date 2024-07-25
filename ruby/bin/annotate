@@ -81,7 +81,7 @@ puts "Errors: #{tests[:error].length}"
 puts "Skipped: #{tests[:skipped].length}"
 puts "Total tests: #{testcases}"
 
-tests.delete(:skipped) unless ENV.fetch('BUILDKITE_PLUGIN_JUNIT_ANNOTATE_SKIPPED_FORMAT', 'none') != 'none'
+skipped = tests.delete(:skipped) # save value for later
 
 tests.values.flatten.each do |failure|
   puts ""
@@ -112,6 +112,19 @@ if report_slowest > 0
   end
   puts "</tbody>"
   puts "</table>"
+  puts "</details>"
+end
+
+if ENV.fetch('BUILDKITE_PLUGIN_JUNIT_ANNOTATE_SKIPPED_FORMAT', 'none') != 'none'
+  STDERR.puts "Reporting skipped tests"
+  puts ""
+  puts "<details>"
+  puts "<summary>#{skipped.length} tests skipped</summary>\n\n"
+  puts "<ol>"
+  skipped.each do |sk|
+    puts "<li>#{CGI.escapeHTML sk.name} in #{CGI.escapeHTML sk.unit_name} (#{CGI.escapeHTML sk.message || "no reason"})</li>\n"
+  end
+  puts "</ol>"
   puts "</details>"
 end
 

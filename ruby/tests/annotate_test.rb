@@ -600,4 +600,31 @@ describe "Junit annotate plugin parser" do
 
     assert_equal 0, status.exitstatus
   end
+
+  it "can report skipped tests" do
+    stdout, stderr, status = Open3.capture3("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_SKIPPED_FORMAT=classname", "#{__dir__}/../bin/annotate", "#{__dir__}/skipped-test/")
+
+    assert_equal stderr, <<~OUTPUT
+      Parsing junit.xml
+      --- ✍️ Preparing annotation
+      Reporting skipped tests
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 0
+      Errors: 0
+      Skipped: 1
+      Total tests: 2
+
+      <details>
+      <summary>1 tests skipped</summary>
+
+      <ol>
+      <li>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec (because of reasons)</li>
+      </ol>
+      </details>
+    OUTPUT
+
+    assert_equal 0, status.exitstatus
+  end
 end
