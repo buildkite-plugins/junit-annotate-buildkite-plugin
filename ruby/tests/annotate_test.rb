@@ -15,6 +15,7 @@ describe "Junit annotate plugin parser" do
     assert_equal stdout, <<~OUTPUT
       Failures: 0
       Errors: 0
+      Skipped: 0
       Total tests: 8
     OUTPUT
 
@@ -34,6 +35,7 @@ describe "Junit annotate plugin parser" do
     assert_equal stdout, <<~OUTPUT
       Failures: 4
       Errors: 0
+      Skipped: 0
       Total tests: 6
       
       <details>
@@ -129,6 +131,7 @@ describe "Junit annotate plugin parser" do
     assert_equal stdout, <<~OUTPUT
       Failures: 2
       Errors: 2
+      Skipped: 0
       Total tests: 6
 
       <details>
@@ -260,6 +263,7 @@ describe "Junit annotate plugin parser" do
     assert_equal stdout, <<~OUTPUT
       Failures: 2
       Errors: 2
+      Skipped: 0
       Total tests: 6
 
       <details>
@@ -355,6 +359,7 @@ describe "Junit annotate plugin parser" do
     assert_equal stdout, <<~OUTPUT
       Failures: 4
       Errors: 0
+      Skipped: 0
       Total tests: 6
       
       <details>
@@ -448,6 +453,7 @@ describe "Junit annotate plugin parser" do
     assert_equal stdout, <<~OUTPUT
       Failures: 1
       Errors: 0
+      Skipped: 0
       Total tests: 2
 
       <details>
@@ -472,6 +478,7 @@ describe "Junit annotate plugin parser" do
     assert_equal stdout, <<~OUTPUT
       Failures: 1
       Errors: 2
+      Skipped: 0
       Total tests: 4
 
       <details>
@@ -504,6 +511,7 @@ describe "Junit annotate plugin parser" do
     assert_equal stdout, <<~OUTPUT
       Failures: 0
       Errors: 1
+      Skipped: 0
       Total tests: 2
 
       <details>
@@ -534,6 +542,7 @@ describe "Junit annotate plugin parser" do
     assert_equal stdout, <<~OUTPUT
       Failures: 0
       Errors: 0
+      Skipped: 0
       Total tests: 8
       
       <details>
@@ -566,6 +575,7 @@ describe "Junit annotate plugin parser" do
     assert_equal stdout, <<~OUTPUT
       Failures: 0
       Errors: 0
+      Skipped: 0
       Total tests: 2
     OUTPUT
 
