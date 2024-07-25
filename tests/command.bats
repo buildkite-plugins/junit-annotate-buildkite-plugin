@@ -237,7 +237,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
 
   assert_output --partial "Failures too large to annotate"
   assert_output --partial "using a simplified annotation"
-  assert_equal "5 ${annotation_input}" "$(wc -l "${annotation_input}" | cut -f 1)"
+  assert_equal "6 ${annotation_input}" "$(wc -l "${annotation_input}" | cut -f 1)"
 
   unstub docker
   unstub du
@@ -476,7 +476,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
 
 @test "can customize skipped tests variable" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
-  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_SKIPPED_FORMAT="whatever"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED="true"
 
   stub mktemp \
     "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
@@ -487,7 +487,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
-    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_SKIPPED_FORMAT='whatever' \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
+    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED='true' \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
 
   run "$PWD/hooks/command"
 
