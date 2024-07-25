@@ -581,4 +581,22 @@ describe "Junit annotate plugin parser" do
 
     assert_equal 0, status.exitstatus
   end
+
+  it "correctly parses skipped tests" do
+    stdout, stderr, status = Open3.capture3("#{__dir__}/../bin/annotate", "#{__dir__}/skipped-test/")
+
+    assert_equal stderr, <<~OUTPUT
+      Parsing junit.xml
+      --- ✍️ Preparing annotation
+    OUTPUT
+
+    assert_equal stdout, <<~OUTPUT
+      Failures: 0
+      Errors: 0
+      Skipped: 1
+      Total tests: 2
+    OUTPUT
+
+    assert_equal 0, status.exitstatus
+  end
 end
