@@ -81,7 +81,7 @@ if [ $has_errors -eq 0 ]; then
   fi
 
   if [[ -e "${annotation_path}" ]]; then
-    TOTAL_TESTS=$(head -4 "${annotation_path}" | grep 'Total tests' | cut -d\  -f3)
+    TOTAL_TESTS=$(head -5 "${annotation_path}" | grep 'Total tests' | cut -d\  -f3)
   else
     TOTAL_TESTS=0
   fi
@@ -96,7 +96,7 @@ elif ! check_size; then
 
   # creating a simplified version of the annotation
   mv "${annotation_path}" "${annotation_path}2"
-  head -4 "${annotation_path}2" >"${annotation_path}"
+  head -5 "${annotation_path}2" >"${annotation_path}"
   # || true is to avoid issues if no summary is found
   grep '<summary>' "${annotation_path}2" >>"${annotation_path}" || true
 
