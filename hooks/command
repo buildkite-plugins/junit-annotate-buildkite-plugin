@@ -51,6 +51,7 @@ docker \
     --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}" \
     --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT:-}" \
     --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST:-}" \
+    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_SKIPPED_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_SKIPPED_FORMAT:-none}" \
     "${RUBY_IMAGE}" ruby /src/bin/annotate /junits \
       > "$annotation_path"
 
@@ -78,7 +79,7 @@ if [ $has_errors -eq 0 ]; then
     echo "Will create annotation anyways"
     create_annotation=1
   fi
-  
+
   if [[ -e "${annotation_path}" ]]; then
     TOTAL_TESTS=$(head -4 "${annotation_path}" | grep 'Total tests' | cut -d\  -f3)
   else
