@@ -18,6 +18,7 @@ failure_format = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT']
 failure_format = 'classname' if !failure_format || failure_format.empty?
 
 report_slowest = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST'].to_i
+report_skipped = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED'] == 'true'
 
 class Failure < Struct.new(:name, :unit_name, :body, :job, :message)
 end
@@ -115,7 +116,7 @@ if report_slowest > 0
   puts "</details>"
 end
 
-if ENV.fetch('BUILDKITE_PLUGIN_JUNIT_ANNOTATE_SKIPPED_FORMAT', 'none') != 'none'
+if report_skipped
   STDERR.puts "Reporting skipped tests"
   puts ""
   puts "<details>"

@@ -602,7 +602,7 @@ describe "Junit annotate plugin parser" do
   end
 
   it "can report skipped tests" do
-    stdout, stderr, status = Open3.capture3("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_SKIPPED_FORMAT=classname", "#{__dir__}/../bin/annotate", "#{__dir__}/skipped-test/")
+    stdout, stderr, status = Open3.capture3("env", "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED=true", "#{__dir__}/../bin/annotate", "#{__dir__}/skipped-test/")
 
     assert_equal stderr, <<~OUTPUT
       Parsing junit.xml
