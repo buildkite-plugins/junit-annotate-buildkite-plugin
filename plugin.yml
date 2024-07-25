@@ -24,6 +24,8 @@ configuration:
       type: string
     min-tests:
       type: integer
+    report-skipped:
+      type: boolean
     report-slowest:
       type: integer
     ruby-image:
