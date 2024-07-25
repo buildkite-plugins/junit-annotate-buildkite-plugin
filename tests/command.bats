@@ -473,3 +473,30 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
   unstub docker
   rm "${annotation_input}"
 }
+
+@test "can customize skipped tests variable" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_SKIPPED_FORMAT="whatever"
+
+  stub mktemp \
+    "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
+    "-d \* : mkdir -p '$annotation_tmp'; echo '$annotation_tmp'"
+
+  stub buildkite-agent \
+    "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
+    "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
+
+  stub docker \
+    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_SKIPPED_FORMAT='whatever' \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
+
+  run "$PWD/hooks/command"
+
+  assert_success
+
+  assert_output --partial "Annotation added"
+
+  unstub mktemp
+  unstub buildkite-agent
+  unstub docker
+  rm "${annotation_input}"
+}
