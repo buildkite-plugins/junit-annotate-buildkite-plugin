@@ -18,8 +18,9 @@ failure_format = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT']
 failure_format = 'classname' if !failure_format || failure_format.empty?
 
 report_slowest = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST'].to_i
+report_skipped = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED'] == 'true'
 
-class Failure < Struct.new(:name, :unit_name, :body, :job, :type, :message)
+class Failure < Struct.new(:name, :unit_name, :body, :job, :message)
 end
 
 class Timing < Struct.new(:name, :unit_name, :time)
@@ -27,7 +28,11 @@ end
 
 junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"), File::FNM_DOTMATCH)
 testcases = 0
-failures = []
+tests = {
+  failure: [],
+  error: [],
+  skipped: []
+}
 timings = []
 
 def text_content(element)
@@ -64,30 +69,27 @@ junit_report_files.sort.each do |file|
     unit_name = testcase.attributes[failure_format].to_s
     time = testcase.attributes['time'].to_f
     timings << Timing.new(name, unit_name, time)
-    testcase.elements.each("failure") do |failure|
-      failures << Failure.new(name, unit_name, text_content(failure), job, :failure, message_content(failure))
-    end
-    testcase.elements.each("error") do |error|
-      failures << Failure.new(name, unit_name, text_content(error), job, :error, message_content(error))
+    testcase.elements.each("failure | error | skipped") do |elem|
+      tests[elem.name.to_sym] << Failure.new(name, unit_name, text_content(elem), job, message_content(elem))
     end
   end
 end
 
 STDERR.puts "--- ✍️ Preparing annotation"
 
-failures_count = failures.select {|f| f.type == :failure }.length
-errors_count = failures.select {|f| f.type == :error }.length
-
-puts "Failures: #{failures_count}"
-puts "Errors: #{errors_count}"
+puts "Failures: #{tests[:failure].length}"
+puts "Errors: #{tests[:error].length}"
+puts "Skipped: #{tests[:skipped].length}"
 puts "Total tests: #{testcases}"
 
-failures.each do |failure|
+skipped = tests.delete(:skipped) # save value for later
+
+tests.values.flatten.each do |failure|
   puts ""
   puts "<details>"
-  puts "<summary><code>#{failure.name} in #{failure.unit_name}</code></summary>\n\n"
+  puts "<summary><code>#{CGI.escapeHTML failure.name} in #{CGI.escapeHTML failure.unit_name}</code></summary>\n\n"
   if failure.message
-    puts "<p>#{failure.message.chomp.strip}</p>\n\n"
+    puts "<p>#{CGI.escapeHTML failure.message.chomp.strip}</p>\n\n"
   end
   if failure.body
     puts "<pre><code>#{CGI.escapeHTML(failure.body.chomp.strip)}</code></pre>\n\n"
@@ -114,4 +116,17 @@ if report_slowest > 0
   puts "</details>"
 end
 
-exit 64 if failures.any? # special exit code to signal test failures
+if report_skipped
+  STDERR.puts "Reporting skipped tests"
+  puts ""
+  puts "<details>"
+  puts "<summary>#{skipped.length} tests skipped</summary>\n\n"
+  puts "<ol>"
+  skipped.each do |sk|
+    puts "<li>#{CGI.escapeHTML sk.name} in #{CGI.escapeHTML sk.unit_name} (#{CGI.escapeHTML sk.message || "no reason"})</li>\n"
+  end
+  puts "</ol>"
+  puts "</details>"
+end
+
+exit 64 if tests.values.flatten.any? # special exit code to signal test failures

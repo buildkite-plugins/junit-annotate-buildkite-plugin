@@ -40,7 +40,7 @@ The buildkite annotation context to use. Useful to differentiate multiple runs o
 
 Default: `-(.*).xml`
 
-The regular expression (with capture group) that matches the job UUID in the junit file names. This is used to create the job links in the annotation. 
+The regular expression (with capture group) that matches the job UUID in the junit file names. This is used to create the job links in the annotation.
 
 To use this, configure your test reporter to embed the `$BUILDKITE_JOB_ID` environment variable into your junit file names. For example `"junit-buildkite-job-$BUILDKITE_JOB_ID.xml"`.
 
@@ -54,7 +54,7 @@ There are two options for this:
 * `file`
   * displays: `MyClass::UnderTest text of the failed expectation in path/to/my_class/under_test.file_ext`
 
-### `fail-build-on-error` (optional)  
+### `fail-build-on-error` (optional)
 
 Default: `false`
 
@@ -69,6 +69,12 @@ Exit code of the plugin if the call to `buildkite-agent artifact download` fails
 ### `min-tests` (optional, integer)
 
 Minimum amount of run tests that need to be analyzed or a failure will be reported. It is useful to ensure that tests are actually run and report files to analyze do contain information.
+
+### `report-skipped` (optional, boolean)
+
+Default: `false`
+
+Will add a list of skipped tests at the end of the annotation. Note that even if there are skipped tests, the annotation may not be added unless other options or results of the processing forces it to.
 
 ### `report-slowest` (optional)
 
