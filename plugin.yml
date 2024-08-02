@@ -36,6 +36,8 @@ configuration:
       type: string
     run-in-docker:
       type: boolean
+    style:
+      type: string
   required:
     - artifacts
   additionalProperties: false
