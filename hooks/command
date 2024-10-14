@@ -56,9 +56,11 @@ docker \
       > "$annotation_path"
 
 exit_code=$?
+echo "exit_code is $my_variable"
 set -e
 
 if [[ $exit_code -eq 64 ]]; then # special exit code to signal test failures
+  echo "--- :boom: entered check for exit code 64"
   has_errors=1
   create_annotation=1
   annotation_style="error"
@@ -67,10 +69,12 @@ if [[ $exit_code -eq 64 ]]; then # special exit code to signal test failures
     fail_build=1
   fi
 elif [[ $exit_code -ne 0 ]]; then
+  echo "entered check for exit code not zero"
   echo "--- :boom: Error when processing JUnit tests"
   exit $exit_code
 fi
 
+echo "$annotation_path"
 cat "$annotation_path"
 
 if [ $has_errors -eq 0 ]; then
@@ -108,10 +112,12 @@ elif ! check_size; then
   fi
 fi
 
+echo "before creating annotation"
 if [ $create_annotation -ne 0 ]; then
   echo "--- :buildkite: Creating annotation"
   # shellcheck disable=SC2002
   cat "$annotation_path" | buildkite-agent annotate --context "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT:-junit}" --style "$annotation_style"
 fi
 
+echo "$fail_build"
 exit $fail_build
