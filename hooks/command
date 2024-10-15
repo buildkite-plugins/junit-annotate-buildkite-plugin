@@ -56,7 +56,7 @@ docker \
       > "$annotation_path"
 
 exit_code=$?
-echo "$exit_code"
+echo "exit_code is: $exit_code"
 set -e
 
 if [[ $exit_code -eq 64 ]]; then # special exit code to signal test failures
