@@ -74,8 +74,9 @@ elif [[ $exit_code -ne 0 ]]; then
   exit $exit_code
 fi
 
-echo "$annotation_path"
+echo "annotation path: $annotation_path"
 cat "$annotation_path"
+echo "has_errors: $has_errors"
 
 if [ $has_errors -eq 0 ]; then
   # done in nested if to simplify outer conditions
@@ -113,11 +114,14 @@ elif ! check_size; then
 fi
 
 echo "before creating annotation"
+echo "min tests: $BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MIN_TESTS"
+echo "create annotation: $create_annotation"
+echo "total tests: $TOTAL_TESTS"
 if [ $create_annotation -ne 0 ]; then
   echo "--- :buildkite: Creating annotation"
   # shellcheck disable=SC2002
   cat "$annotation_path" | buildkite-agent annotate --context "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT:-junit}" --style "$annotation_style"
 fi
 
-echo "$fail_build"
+echo "fail build: $fail_build"
 exit $fail_build
