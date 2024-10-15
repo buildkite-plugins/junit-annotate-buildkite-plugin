@@ -114,7 +114,6 @@ elif ! check_size; then
 fi
 
 echo "before creating annotation"
-echo "min tests: $BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MIN_TESTS"
 echo "create annotation: $create_annotation"
 echo "total tests: $TOTAL_TESTS"
 if [ $create_annotation -ne 0 ]; then
