@@ -115,7 +115,6 @@ fi
 
 echo "before creating annotation"
 echo "create annotation: $create_annotation"
-echo "total tests: $TOTAL_TESTS"
 if [ $create_annotation -ne 0 ]; then
   echo "--- :buildkite: Creating annotation"
   # shellcheck disable=SC2002
