@@ -500,3 +500,30 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
   unstub docker
   rm "${annotation_input}"
 }
+
+@test "creates annotation with no failures but with slowest tests trigger" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=2
+
+  stub mktemp \
+    "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
+    "-d \* : mkdir -p '$annotation_tmp'; echo '$annotation_tmp'"
+
+  stub buildkite-agent \
+    "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
+    "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
+
+  stub docker \
+    "${DOCKER_STUB_DEFAULT_OPTIONS} ruby /src/bin/annotate /junits : echo '2 slowest tests'"
+
+  run "$PWD/hooks/command"
+
+  assert_success
+  assert_output --partial "2 slowest tests"
+  assert_output --partial "Create annotation with slowest tests"
+  assert_equal "$(cat "${annotation_input}")" '2 slowest tests'
+
+  unstub mktemp
+  unstub buildkite-agent
+  unstub docker
+}
