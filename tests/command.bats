@@ -514,7 +514,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
-    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=2 \* --env \* ruby /src/bin/annotate /junits : echo '2 slowest tests'"
+    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=2 --env \* ruby /src/bin/annotate /junits : echo '2 slowest tests'"
 
   run "$PWD/hooks/command"
 
