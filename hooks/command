@@ -80,6 +80,11 @@ if [ $has_errors -eq 0 ]; then
     create_annotation=1
   fi
 
+  if [[ -n "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST:-}" ]]; then
+    echo "Create annotation with slowest tests"
+    create_annotation=1
+  fi
+
   if [[ -e "${annotation_path}" ]]; then
     TOTAL_TESTS=$(head -5 "${annotation_path}" | grep 'Total tests' | cut -d\  -f3)
   else
