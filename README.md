@@ -18,6 +18,26 @@ steps:
           artifacts: tmp/junit-*.xml
 ```
 
+For scenarios where you have different artifact paths that you want to add as annotation then call the plugin multiple times in the pipeline with different contexts as shown below:
+
+```yml
+steps:
+  - command: test.sh
+    parallelism: 50
+    artifact_paths: tmp/junit-*.xml
+  - command: anothertest.sh
+    artifact_paths: artifacts/junit-*.xml
+  - wait: ~
+    continue_on_failure: true
+  - plugins:
+      - junit-annotate#v2.5.0:
+          artifacts: tmp/junit-*.xml
+  - plugins:
+      - junit-annotate#v2.5.0:
+          artifacts: artifacts/junit-*.xml
+          context: junit-artifacts
+```
+
 ## Configuration
 
 ### `artifacts` (required)
