@@ -528,3 +528,60 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
   unstub docker
   rm "${annotation_input}"
 }
+
+@test "runs in docker by default" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=false
+
+  stub mktemp \
+    "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
+    "-d \* : mkdir -p '$annotation_tmp'; echo '$annotation_tmp'"
+
+  stub buildkite-agent \
+    "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
+    "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
+
+  stub docker \
+    "${DOCKER_STUB_DEFAULT_OPTIONS} ruby /src/bin/annotate /junits : echo '<details>Failure</details>' && exit 64"
+
+  run "$PWD/hooks/command"
+
+  assert_success
+
+  assert_output --partial "Annotation added with context junit and style error"
+  assert_equal "$(cat "${annotation_input}")" '<details>Failure</details>'
+
+  unstub mktemp
+  unstub buildkite-agent
+  unstub docker
+  rm "${annotation_input}"
+}
+
+@test "does not run in docker when run-in-docker is false" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=false
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER=false
+
+  stub mktemp \
+    "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
+    "-d \* : mkdir -p '$annotation_tmp'; echo '$annotation_tmp'"
+
+  stub buildkite-agent \
+    "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
+    "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
+
+  stub ruby \
+    "/plugin/hooks/../ruby/bin/annotate /plugin/${artifacts_tmp} : echo '<details>Failure</details>' && exit 64"
+
+  run "$PWD/hooks/command"
+
+  assert_success
+
+  assert_output --partial "Annotation added with context junit and style error"
+  assert_equal "$(cat "${annotation_input}")" '<details>Failure</details>'
+
+  unstub mktemp
+  unstub buildkite-agent
+  unstub ruby
+  rm "${annotation_input}"
+}

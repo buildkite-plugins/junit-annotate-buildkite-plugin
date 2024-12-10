@@ -30,6 +30,8 @@ configuration:
       type: integer
     ruby-image:
       type: string
+    run-in-docker:
+      type: boolean
   required:
     - artifacts
   additionalProperties: false

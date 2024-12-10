@@ -108,6 +108,12 @@ The docker image to use for running the analysis code. Must be a valid image ref
 
 Default: `ruby:3.1-alpine@sha256:a39e26d0598837f08c75a42c8b0886d9ed5cc862c4b535662922ee1d05272fca`
 
+### `run-in-docker` (optional, boolean)
+
+Default: `true`
+
+Controls whether the JUnit processing should run inside a Docker container. When set to `false`, the processing will run directly on the host using the system's Ruby installation.
+
 ## Developing
 
 To run testing, shellchecks and plugin linting use use `bk run` with the [Buildkite CLI](https://github.com/buildkite/cli).
