@@ -42,18 +42,22 @@ fi
 echo "--- :junit: Processing the junits"
 
 set +e
-docker \
-  --log-level "error" \
-  run \
-    --rm \
-    --volume "$artifacts_dir:/junits" \
-    --volume "$PLUGIN_DIR/ruby:/src" \
-    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}" \
-    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT:-}" \
-    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST:-}" \
-    --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED:-}" \
-    "${RUBY_IMAGE}" ruby /src/bin/annotate /junits \
-      > "$annotation_path"
+if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-true}" =~ "true" ]]; then
+  docker \
+    --log-level "error" \
+    run \
+      --rm \
+      --volume "$artifacts_dir:/junits" \
+      --volume "$PLUGIN_DIR/ruby:/src" \
+      --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}" \
+      --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT:-}" \
+      --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST:-}" \
+      --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED:-}" \
+      "${RUBY_IMAGE}" ruby /src/bin/annotate /junits \
+        > "$annotation_path"
+else
+  ruby "${PLUGIN_DIR}/ruby/bin/annotate" "${artifacts_dir}" > "$annotation_path"
+fi
 
 exit_code=$?
 set -e
