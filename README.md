@@ -14,7 +14,7 @@ steps:
   - wait: ~
     continue_on_failure: true
   - plugins:
-      - junit-annotate#v2.5.0:
+      - junit-annotate#v2.6.0:
           artifacts: tmp/junit-*.xml
 ```
 
@@ -30,10 +30,10 @@ steps:
   - wait: ~
     continue_on_failure: true
   - plugins:
-      - junit-annotate#v2.5.0:
+      - junit-annotate#v2.6.0:
           artifacts: tmp/junit-*.xml
   - plugins:
-      - junit-annotate#v2.5.0:
+      - junit-annotate#v2.6.0:
           artifacts: artifacts/junit-*.xml
           context: junit-artifacts
 ```
@@ -140,7 +140,7 @@ To test your plugin in your builds prior to opening a pull request, you can refe
 steps:
   - label: Annotate
     plugins:
-      - YourGithubHandle/junit-annotate#v2.5.0:
+      - YourGithubHandle/junit-annotate#v2.6.0:
           ...
 ```
 
