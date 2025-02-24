@@ -32,6 +32,8 @@ configuration:
       type: string
     run-in-docker:
       type: boolean
+    download-artifacts:
+      type: boolean
   required:
     - artifacts
   additionalProperties: false
