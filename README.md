@@ -118,7 +118,7 @@ Controls whether the JUnit processing should run inside a Docker container. When
 
 Default: `true`
 
-Controls whether the Junit processing should download the artifacts from buildkite or not. When set to `false`, the plugin expects the artifacts to be present without having to download them. Usefull to run the plugin in the same step as the one generating the test results.
+Controls whether the Junit processing should download the artifacts from buildkite or not. When set to `false`, the plugin expects the artifacts to be present without having to download them. Useful to run the plugin in the same step as the one generating the test results.
 
 ## Developing
 
