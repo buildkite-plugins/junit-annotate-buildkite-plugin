@@ -42,7 +42,7 @@ fi
 
 echo "--- :junit: Building the failures file"
 
-if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-true}" =~ "true" ]]; then
+if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-false}" =~ "true" ]]; then
   docker \
     --log-level "error" \
     run \
@@ -62,7 +62,7 @@ buildkite-agent artifact upload "${failures_file_path}"
 echo "--- :junit: Processing the junits"
 
 set +e
-if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-true}" =~ "true" ]]; then
+if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-false}" =~ "true" ]]; then
   docker \
     --log-level "error" \
     run \
