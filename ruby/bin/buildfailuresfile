@@ -79,8 +79,13 @@ end
 
 # puts tests[:failure]
 
+# JUSTIN: might want to make it more simple. I.e. remove "tests."
+# tests.each do |elem|
+#   puts "tests.#{elem}_*.*" #can probably remove the .*  from the end?
+# end
+
 tests.each do |elem|
-  puts "tests.#{elem}_*.*" #can probably remove the .*  from the end?
+  puts "*#{elem}*" #can probably remove the .*  from the end?
 end
 
 # tests.values.flatten.each do |failure|
