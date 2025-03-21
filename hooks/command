@@ -13,6 +13,7 @@ RUBY_IMAGE="${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUBY_IMAGE:-ruby:3.1-alpine@sha256
 
 artifacts_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX")"
 annotation_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-annotation-tmp.XXXXXXXXXX")"
+failures_file_path="./failures_artifacts_names.txt"
 annotation_path="${annotation_dir}/annotation.md"
 annotation_style="info"
 fail_build=0
@@ -38,6 +39,25 @@ if ! buildkite-agent artifact download "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFA
   echo "--- :boom: Could not download artifacts"
   exit "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILED_DOWNLOAD_EXIT_CODE:-2}"
 fi
+
+echo "--- :junit: Building the failures file"
+
+if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-true}" =~ "true" ]]; then
+  docker \
+    --log-level "error" \
+    run \
+      --rm \
+      --volume "$artifacts_dir:/junits" \
+      --volume "$PLUGIN_DIR/ruby:/src" \
+      --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}" \
+      --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT:-}" \
+      "${RUBY_IMAGE}" ruby /src/bin/buildfailuresfile /junits \
+        > "$failures_file_path"
+else
+  ruby "${PLUGIN_DIR}/ruby/bin/buildfailuresfile" "${artifacts_dir}" > "$failures_file_path"
+fi
+
+buildkite-agent artifact upload "${failures_file_path}"
 
 echo "--- :junit: Processing the junits"
 

@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+require 'rexml/document'
+require 'rexml/element'
+require 'set'
+
+junits_dir = ARGV[0]
+abort("Usage: annotate <junits-dir>") unless junits_dir
+abort("#{junits_dir} does not exist") unless Dir.exist?(junits_dir)
+
+job_pattern = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN']
+job_pattern = '-(.*).xml' if !job_pattern || job_pattern.empty?
+
+failure_format = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT']
+failure_format = 'classname' if !failure_format || failure_format.empty?
+
+class Failure < Struct.new(:unit_name)
+end
+
+junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"), File::FNM_DOTMATCH)
+testcases = 0
+tests = Set.new
+
+junit_report_files.sort.each do |file|
+  next if File.directory?(file)
+
+  job = File.basename(file)[/#{job_pattern}/, 1]
+  xml = File.read(file)
+  doc = REXML::Document.new(xml)
+
+  REXML::XPath.each(doc, '//testsuite/testcase') do |testcase|
+    testcases += 1
+    unit_name = testcase.attributes[failure_format].to_s
+    testcase.elements.each("failure | error | skipped") do |elem|
+      tests.add(unit_name)
+    end
+  end
+end
+
+tests.each do |elem|
+  puts "*#{elem}*"
+end
