@@ -14,80 +14,29 @@ job_pattern = '-(.*).xml' if !job_pattern || job_pattern.empty?
 failure_format = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT']
 failure_format = 'classname' if !failure_format || failure_format.empty?
 
-# class Failure < Struct.new(:name, :unit_name, :body, :job, :message)
-# end
-
 class Failure < Struct.new(:unit_name)
-end
-
-class Timing < Struct.new(:name, :unit_name, :time)
 end
 
 junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"), File::FNM_DOTMATCH)
 testcases = 0
-# tests = {
-#   failure: Set.new,
-#   error: Set.new,
-#   skipped: Set.new
-# }
 tests = Set.new
-timings = []
-
-def text_content(element)
-  # Handle mulptiple CDATA/text children elements
-  text = element.texts().map(&:value).join.strip
-  if text.empty?
-    nil
-  else
-    text
-  end
-end
-
-def message_content(element)
-  # Handle empty attributes
-  message = element.attributes['message'];
-  if message.nil? || message.empty?
-    nil
-  else
-    message.to_s
-  end
-end
 
 junit_report_files.sort.each do |file|
   next if File.directory?(file)
 
-  # STDERR.puts "Parsing #{file.sub(junits_dir, '')}"
   job = File.basename(file)[/#{job_pattern}/, 1]
   xml = File.read(file)
   doc = REXML::Document.new(xml)
 
   REXML::XPath.each(doc, '//testsuite/testcase') do |testcase|
     testcases += 1
-    name = testcase.attributes['name'].to_s
     unit_name = testcase.attributes[failure_format].to_s
-    time = testcase.attributes['time'].to_f
-    timings << Timing.new(name, unit_name, time)
     testcase.elements.each("failure | error | skipped") do |elem|
-      # newFailure = Failure.new(unit_name)
-      # if tests[:elem]
-        # tests[elem.name.to_sym] << unit_name
-      # end
       tests.add(unit_name)
     end
   end
 end
 
-# puts tests[:failure]
-
-# JUSTIN: might want to make it more simple. I.e. remove "tests."
-# tests.each do |elem|
-#   puts "tests.#{elem}_*.*" #can probably remove the .*  from the end?
-# end
-
 tests.each do |elem|
-  puts "*#{elem}*" #can probably remove the .*  from the end?
+  puts "*#{elem}*"
 end
-
-# tests.values.flatten.each do |failure|
-# 	puts "tests.#{failure.unit_name}_*.*"
-# end
