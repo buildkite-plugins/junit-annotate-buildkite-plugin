@@ -33,10 +33,15 @@ function check_size {
 
 trap cleanup EXIT
 
-echo "--- :junit: Download the junits"
-if ! buildkite-agent artifact download "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS}" "$artifacts_dir"; then
-  echo "--- :boom: Could not download artifacts"
-  exit "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILED_DOWNLOAD_EXIT_CODE:-2}"
+if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_DOWNLOAD_ARTIFACTS:-true}" == "true" ]]; then
+  echo "--- :junit: Download the junits"
+  if ! buildkite-agent artifact download "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS}" "$artifacts_dir"; then
+    echo "--- :boom: Could not download artifacts"
+    exit "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILED_DOWNLOAD_EXIT_CODE:-2}"
+  fi
+else
+  echo "--- :junit: Using the provided artifacts"
+    cp -r "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS}" "$artifacts_dir"
 fi
 
 echo "--- :junit: Processing the junits"
