@@ -557,3 +557,13 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
   unstub ruby
   rm "${annotation_input}"
 }
+
+@test "does not download artifacts when download-artifacts is false" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR=false
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_DOWNLOAD_ARTIFACTS=false
+
+  run "$PWD/hooks/command"
+
+  assert_output --partial "Using the provided artifacts"
+}

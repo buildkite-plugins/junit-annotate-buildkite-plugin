@@ -114,6 +114,12 @@ Default: `true`
 
 Controls whether the JUnit processing should run inside a Docker container. When set to `false`, the processing will run directly on the host using the system's Ruby installation.
 
+### `download-artifacts` (optional, boolean)
+
+Default: `true`
+
+Controls whether the Junit processing should download the artifacts from buildkite or not. When set to `false`, the plugin expects the artifacts to be present without having to download them. Useful to run the plugin in the same step as the one generating the test results.
+
 ## Developing
 
 To run testing, shellchecks and plugin linting use use `bk run` with the [Buildkite CLI](https://github.com/buildkite/cli).
