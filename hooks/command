@@ -47,8 +47,8 @@ if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-true}" =~ "true" ]]; the
     --log-level "error" \
     run \
       --rm \
-      --volume "$artifacts_dir:/junits" \
-      --volume "$PLUGIN_DIR/ruby:/src" \
+      --volume "$artifacts_dir:/junits:Z" \
+      --volume "$PLUGIN_DIR/ruby:/src:Z" \
       --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN:-}" \
       --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT:-}" \
       --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST:-}" \
