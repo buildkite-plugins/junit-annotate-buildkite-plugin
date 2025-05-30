@@ -14,7 +14,7 @@ steps:
   - wait: ~
     continue_on_failure: true
   - plugins:
-      - junit-annotate#v2.6.0:
+      - junit-annotate#v2.7.0:
           artifacts: tmp/junit-*.xml
 ```
 
@@ -30,10 +30,10 @@ steps:
   - wait: ~
     continue_on_failure: true
   - plugins:
-      - junit-annotate#v2.6.0:
+      - junit-annotate#v2.7.0:
           artifacts: tmp/junit-*.xml
   - plugins:
-      - junit-annotate#v2.6.0:
+      - junit-annotate#v2.7.0:
           artifacts: artifacts/junit-*.xml
           context: junit-artifacts
 ```
@@ -114,6 +114,17 @@ Default: `true`
 
 Controls whether the JUnit processing should run inside a Docker container. When set to `false`, the processing will run directly on the host using the system's Ruby installation.
 
+## Compatibility
+
+| Elastic Stack | Agent Stack K8s | Hosted (Mac) | Hosted (Linux) | Notes |
+| :-----------: | :-------------: | :----: | :----: |:---- |
+| ✅ | ⚠️ | ⚠️ | ✅ | **K8s** - Out of the box, requires `run-in-docker: false` and a container image with `ruby` installed<br>Likely requires some complex podSpec (pending investigation)<br>**Hosted (Mac)** - instances do not ship with the Docker daemon, but can use a `ruby` binary on the agent |
+
+- ✅ Fully supported (all combinations of attributes have been tested to pass)
+- ⚠️ Partially supported (some combinations cause errors/issues)
+- ❌ Not supported
+
+
 ## Developing
 
 To run testing, shellchecks and plugin linting use use `bk run` with the [Buildkite CLI](https://github.com/buildkite/cli).
@@ -140,7 +151,7 @@ To test your plugin in your builds prior to opening a pull request, you can refe
 steps:
   - label: Annotate
     plugins:
-      - YourGithubHandle/junit-annotate#v2.6.0:
+      - YourGithubHandle/junit-annotate#v2.7.0:
           ...
 ```
 
