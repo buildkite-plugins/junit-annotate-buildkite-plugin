@@ -116,9 +116,9 @@ Controls whether the JUnit processing should run inside a Docker container. When
 
 ## Compatibility
 
-| Plugin | Elastic Stack | Agent Stack K8s | Hosted (Mac) | Hosted (Linux) | Notes |
-| ------ | :-----------: | :-------------: | :----: | :----: |:---- |
-| Junit Annotate | ✅ | ⚠️ | ⚠️ | ✅ | **K8s** - Out of the box, requires `run-in-docker: false` and a container image with `ruby` installed<br>Likely requires some complex podSpec (pending investigation)<br>**Hosted (Mac)** - instances do not ship with the Docker daemon, but can use a `ruby` binary on the agent |
+| Elastic Stack | Agent Stack K8s | Hosted (Mac) | Hosted (Linux) | Notes |
+| :-----------: | :-------------: | :----: | :----: |:---- |
+| ✅ | ⚠️ | ⚠️ | ✅ | **K8s** - Out of the box, requires `run-in-docker: false` and a container image with `ruby` installed<br>Likely requires some complex podSpec (pending investigation)<br>**Hosted (Mac)** - instances do not ship with the Docker daemon, but can use a `ruby` binary on the agent |
 
 - ✅ Fully supported (all combinations of attributes have been tested to pass)
 - ⚠️ Partially supported (some combinations cause errors/issues)
