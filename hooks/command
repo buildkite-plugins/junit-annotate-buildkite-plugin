@@ -43,7 +43,7 @@ fi
 echo "--- :junit: Building the failures file"
 
 if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-true}" =~ "true" ]]; then
-  docker \
+  podman \
     --log-level "error" \
     run \
       --rm \
@@ -63,7 +63,7 @@ echo "--- :junit: Processing the junits"
 
 set +e
 if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-true}" =~ "true" ]]; then
-  docker \
+  podman \
     --log-level "error" \
     run \
       --rm \
