@@ -17,3 +17,12 @@ steps:
     plugins:
       - shellcheck#v1.4.0:
           files: hooks/*
+
+  - label: "Security Scan"
+    key: security_scan
+    plugins:
+      - secrets#v1.0.0:
+          variables:
+            GITHUB_TOKEN: GITHUB_TOKEN
+      - ossf-scorecard#v1.0.0:
+          github_token: $$GITHUB_TOKEN
