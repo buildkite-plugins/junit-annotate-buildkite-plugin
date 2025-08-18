@@ -14,10 +14,11 @@ RUBY_IMAGE="${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUBY_IMAGE:-ruby:3.1-alpine@sha256
 artifacts_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX")"
 annotation_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-annotation-tmp.XXXXXXXXXX")"
 annotation_path="${annotation_dir}/annotation.md"
-annotation_style="info"
+annotation_style="${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_STYLE:-info}"
 fail_build=0
 has_errors=0
 create_annotation=0
+
 
 # shellcheck disable=2317  #  this is a signal function
 function cleanup {
@@ -65,7 +66,7 @@ set -e
 if [[ $exit_code -eq 64 ]]; then # special exit code to signal test failures
   has_errors=1
   create_annotation=1
-  annotation_style="error"
+  # annotation_style="error"
   if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR:-false}" =~ (true|on|1) ]]; then
     echo "--- :boom: Build will fail due to errors being found"
     fail_build=1
@@ -103,17 +104,26 @@ if [ $has_errors -eq 0 ]; then
 elif ! check_size; then
   echo "--- :warning: Failures too large to annotate"
 
-  # creating a simplified version of the annotation
-  mv "${annotation_path}" "${annotation_path}2"
-  head -5 "${annotation_path}2" >"${annotation_path}"
-  # || true is to avoid issues if no summary is found
-  grep '<summary>' "${annotation_path}2" >>"${annotation_path}" || true
+  if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ADD_ERROR_ANNOTATION:-false}" =~ (true|on|1) ]]; then
+    fail_build=1
+    echo "--- :buildkite: Creating failure annotation"
+    annotation_path="${annotation_dir}/failed-annotation.md"
+    echo "<details><summary><code>The failures are too large to create a build annotation. Please inspect the failures manually.</code></summary></details>" > ${annotation_path}
 
-  if ! check_size; then
-    echo "The failures are too large to create a build annotation. Please inspect the failed JUnit artifacts manually."
-    create_annotation=0
+    create_annotation=1
   else
-    echo "The failures are too large to create complete annotation, using a simplified annotation"
+    # creating a simplified version of the annotation
+    mv "${annotation_path}" "${annotation_path}2"
+    head -5 "${annotation_path}2" >"${annotation_path}"
+    # || true is to avoid issues if no summary is found
+    grep '<summary>' "${annotation_path}2" >>"${annotation_path}" || true
+
+    if ! check_size; then
+      echo "The failures are too large to create a build annotation. Please inspect the failed JUnit artifacts manually."
+      create_annotation=0
+    else
+      echo "The failures are too large to create complete annotation, using a simplified annotation"
+    fi
   fi
 fi
 
@@ -123,4 +133,9 @@ if [ $create_annotation -ne 0 ]; then
   cat "$annotation_path" | buildkite-agent annotate --context "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_CONTEXT:-junit}" --style "$annotation_style"
 fi
 
-exit $fail_build
+if ((fail_build)); then
+  echo "--- :boom: Failing build due to error"
+  exit 1
+else
+  exit 0
+fi
