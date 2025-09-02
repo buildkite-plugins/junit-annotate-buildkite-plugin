@@ -19,7 +19,8 @@ fail_build=0
 has_errors=0
 create_annotation=0
 
-# shellcheck disable=2317  #  this is a signal function
+# shellcheck disable=2317  # this is a signal function
+# shellcheck disable=2329  # this function is used but SC isn't picking it up 
 function cleanup {
   rm -rf "${artifacts_dir}"
   rm -rf "${annotation_dir}"
