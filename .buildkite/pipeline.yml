@@ -1,7 +1,7 @@
 steps:
   - label: ":bash: Plugin"
     plugins:
-      - plugin-tester#v1.2.0: ~
+      - plugin-tester#v1.3.0: ~
 
   - label: ":ruby: Ruby"
     plugins:
