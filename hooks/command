@@ -96,6 +96,7 @@ elif [[ $exit_code -ne 0 ]]; then
 fi
 
 cat "$annotation_path"
+buildkite-agent artifact upload "${annotation_path}"
 
 if [ $has_errors -eq 0 ]; then
   # done in nested if to simplify outer conditions
