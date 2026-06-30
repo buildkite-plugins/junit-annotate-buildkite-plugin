@@ -5,7 +5,7 @@ steps:
 
   - label: ":ruby: Ruby"
     plugins:
-      - docker-compose#v5.12.1:
+      - docker-compose#v5.13.0:
           run: ruby
 
   - label: "✨ Lint"
