@@ -1,7 +1,7 @@
 version: '2'
 services:
   ruby:
-    image: ruby:4.0-alpine@sha256:6ef7d546bffb191fb5018856d011a82d35461966a26d8ff76f4e02ccaad29615
+    image: ruby:4.0-alpine@sha256:6ec7aeb4f3f0b67a21fb73a83fc20a4055696e64b933229f68ec805a3de38fcc
     command: rake
     working_dir: /src
     volumes:
