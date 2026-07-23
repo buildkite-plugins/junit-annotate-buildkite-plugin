@@ -86,6 +86,19 @@ Default: `2`
 
 Exit code of the plugin if the call to `buildkite-agent artifact download` fails.
 
+### `add-error-annotation` (optional, boolean)
+
+Default: `false`
+
+If true and there is an issue with generating annotations, output an error to let the user know.
+
+### `context` (optional)
+
+Default: `junit`
+
+Context to use when passing annotations to buildkite.
+
+
 ### `min-tests` (optional, integer)
 
 Minimum amount of run tests that need to be analyzed or a failure will be reported. It is useful to ensure that tests are actually run and report files to analyze do contain information.
@@ -113,6 +126,13 @@ Default: `ruby:3.1-alpine@sha256:a39e26d0598837f08c75a42c8b0886d9ed5cc862c4b5356
 Default: `true`
 
 Controls whether the JUnit processing should run inside a Docker container. When set to `false`, the processing will run directly on the host using the system's Ruby installation.
+
+### `style` (optional)
+
+Default: `info`
+
+The style to use for annotations.
+
 
 ## Compatibility
 
