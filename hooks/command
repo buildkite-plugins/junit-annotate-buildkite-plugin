@@ -8,7 +8,7 @@ if [[ -z "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS:-}" ]]; then
 fi
 
 PLUGIN_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)/.."
-MAX_SIZE=1024 # in KB
+MAX_SIZE=${BUILDKITE_PLUGIN_JUNIT_MAX_SIZE:-1024} # in KB
 RUBY_IMAGE="${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUBY_IMAGE:-ruby:3.1-alpine@sha256:a39e26d0598837f08c75a42c8b0886d9ed5cc862c4b535662922ee1d05272fca}"
 
 artifacts_dir="$(pwd)/$(mktemp -d "junit-annotate-plugin-artifacts-tmp.XXXXXXXXXX")"
@@ -29,6 +29,7 @@ function cleanup {
 function check_size {
   local size_in_kb
   size_in_kb=$(du -k "${annotation_path}" | cut -f 1)
+
   [ "${size_in_kb}" -lt "${MAX_SIZE}" ]
 }
 
@@ -66,7 +67,8 @@ set -e
 if [[ $exit_code -eq 64 ]]; then # special exit code to signal test failures
   has_errors=1
   create_annotation=1
-  # annotation_style="error"
+  annotation_style="error"
+
   if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAIL_BUILD_ON_ERROR:-false}" =~ (true|on|1) ]]; then
     echo "--- :boom: Build will fail due to errors being found"
     fail_build=1
