@@ -24,8 +24,6 @@ configuration:
       type: string
     add-error-annotation:
       type: boolean
-    context:
-      type: string
     min-tests:
       type: integer
     report-skipped:
