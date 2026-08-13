@@ -5,7 +5,7 @@ steps:
 
   - label: ":ruby: Ruby"
     plugins:
-      - docker-compose#v5.13.0:
+      - docker-compose#v5.14.0:
           run: ruby
 
   - label: "✨ Lint"
@@ -21,7 +21,7 @@ steps:
   - label: "Security Scan"
     key: security_scan
     plugins:
-      - secrets#v2.4.0:
+      - secrets#v2.5.0:
           variables:
             GITHUB_TOKEN: GITHUB_TOKEN
       - ossf-scorecard#v1.0.1:
