@@ -213,7 +213,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
 }
 
 @test "creates summary annotation if original is larger than MAX_SIZE" {
-  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MAX_SIZE="100"
 
   stub mktemp \
@@ -561,7 +561,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
 
 @test "creates error annotation when annotations too large and ADD_ERROR_ANNOTATION is set" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
-  export BUILDKITE_PLUGIN_JUNIT_MAX_SIZE="1"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MAX_SIZE="1"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ADD_ERROR_ANNOTATION="true"
 
   stub mktemp \
@@ -578,14 +578,6 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
 
   stub docker \
     "${DOCKER_STUB_DEFAULT_OPTIONS} ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
-
-
-  # stub buildkite-agent \
-  #   "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
-  #   "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
-
-  # stub docker \
-  #    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=5 --env \* \* ruby /src/bin/annotate /junits : cat tests/2-slowest-tests.output"
 
   run "$PWD/hooks/command"
 
