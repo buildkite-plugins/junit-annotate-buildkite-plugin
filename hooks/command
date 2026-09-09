@@ -110,7 +110,7 @@ elif ! check_size; then
     fail_build=1
     echo "--- :buildkite: Creating failure annotation"
     annotation_path="${annotation_dir}/failed-annotation.md"
-    echo "<details><summary><code>The failures are too large to create a build annotation. Please inspect the failures manually.</code></summary></details>" > ${annotation_path}
+    echo "<details><summary><code>The failures are too large to create a build annotation. Please inspect the failures manually.</code></summary></details>" > "${annotation_path}"
 
     create_annotation=1
   else
