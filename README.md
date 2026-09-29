@@ -92,12 +92,6 @@ Default: `false`
 
 If true and there is an issue with generating annotations, output an error to let the user know.
 
-### `context` (optional)
-
-Default: `junit`
-
-Context to use when passing annotations to buildkite.
-
 ### `max-size` (optional, integer)
 
 Default: 1024 (kb)

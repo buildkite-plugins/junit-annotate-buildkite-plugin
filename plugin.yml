@@ -24,6 +24,8 @@ configuration:
       type: string
     add-error-annotation:
       type: boolean
+    max-size:
+      type: integer
     min-tests:
       type: integer
     report-skipped:
