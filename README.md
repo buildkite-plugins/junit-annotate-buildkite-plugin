@@ -120,8 +120,6 @@ The docker image to use for running the analysis code. Must be a valid image ref
 
 Default: `ruby:4.0.9-alpine@sha256:d0c5befc0864d31c6219321c8d79de2941d1bc31c41505d9c9289c6192c36d60`
 
-The default image's CA trust checks are documented in [Ruby image trust verification](docs/emudhra-verification.md). Custom images and the host's network clients require separate trust-store maintenance.
-
 ### `run-in-docker` (optional, boolean)
 
 Default: `true`
