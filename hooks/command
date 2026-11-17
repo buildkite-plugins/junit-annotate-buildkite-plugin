@@ -43,6 +43,11 @@ fi
 
 echo "--- :junit: Processing the junits"
 
+exclude_test_env=()
+for name in ${!BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_@}; do
+  exclude_test_env+=(--env "$name=${!name}")
+done
+
 set +e
 if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-true}" =~ "true" ]]; then
   docker \
@@ -56,6 +61,7 @@ if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-true}" =~ "true" ]]; the
       --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST:-}" \
       --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED:-}" \
       --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE:-}" \
+      ${exclude_test_env[@]+"${exclude_test_env[@]}"} \
       "${RUBY_IMAGE}" ruby /src/bin/annotate /junits \
         > "$annotation_path"
 else
@@ -117,7 +123,7 @@ elif ! check_size; then
   else
     # creating a simplified version of the annotation
     mv "${annotation_path}" "${annotation_path}2"
-    head -5 "${annotation_path}2" >"${annotation_path}"
+    sed -n '/^<details>$/q;p' "${annotation_path}2" >"${annotation_path}"
     # || true is to avoid issues if no summary is found
     grep '<summary>' "${annotation_path}2" >>"${annotation_path}" || true
 

@@ -19,6 +19,8 @@ failure_format = 'classname' if !failure_format || failure_format.empty?
 
 report_slowest = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST'].to_i
 report_skipped = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED'] == 'true'
+exclude_tests = ENV.select { |key, _| key.match?(/\ABUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_\d+\z/) }.values
+abort('exclude-tests entries must not be empty') if exclude_tests.any?(&:empty?)
 title = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE'].to_s
 
 class Failure < Struct.new(:name, :unit_name, :body, :job, :message)
@@ -29,6 +31,7 @@ end
 
 junit_report_files = Dir.glob(File.join(junits_dir, "**", "*"), File::FNM_DOTMATCH)
 testcases = 0
+excluded_testcases = 0
 tests = {
   failure: [],
   error: [],
@@ -70,7 +73,12 @@ junit_report_files.sort.each do |file|
     unit_name = testcase.attributes[failure_format].to_s
     time = testcase.attributes['time'].to_f
     timings << Timing.new(name, unit_name, time)
-    testcase.elements.each("failure | error | skipped") do |elem|
+    results = testcase.get_elements("failure | error | skipped")
+    if !results.empty? && exclude_tests.any? { |keyword| name.include?(keyword) }
+      excluded_testcases += 1
+      next
+    end
+    results.each do |elem|
       tests[elem.name.to_sym] << Failure.new(name, unit_name, text_content(elem), job, message_content(elem))
     end
   end
@@ -78,12 +86,13 @@ end
 
 STDERR.puts "--- ✍️ Preparing annotation"
 
-# Keep the heading on one line so the hook's five-line summary includes all counts.
+# Keep the heading on one line so the hook can find Total tests in the first five lines.
 puts "<h1>#{CGI.escapeHTML(title).gsub("\r", '&#13;').gsub("\n", '&#10;')}</h1>" unless title.empty?
 puts "Failures: #{tests[:failure].length}"
 puts "Errors: #{tests[:error].length}"
 puts "Skipped: #{tests[:skipped].length}"
 puts "Total tests: #{testcases}"
+puts "Excluded tests: #{excluded_testcases}" if excluded_testcases > 0
 
 skipped = tests.delete(:skipped) # save value for later
 

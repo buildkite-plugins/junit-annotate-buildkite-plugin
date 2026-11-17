@@ -69,9 +69,11 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
   rm "${annotation_input}"
 }
 
-@test "can pass through optional job uuid file pattern" {
+@test "can pass through optional job uuid file pattern and exclusion keywords" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN="custom_(*)_pattern.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_0="checkout with expired card"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_1="refund during maintenance"
 
   stub mktemp \
     "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
@@ -82,7 +84,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
-    "--log-level error run --rm --volume \* --volume \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN='custom_(*)_pattern.xml' --env \* --env \* --env \* --env \* \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
+    "--log-level error run --rm --volume \* --volume \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN='custom_(*)_pattern.xml' --env \* --env \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_0='checkout with expired card' --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_1='refund during maintenance' \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
 
   run "$PWD/hooks/command"
 
@@ -259,7 +261,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
-    "${DOCKER_STUB_DEFAULT_OPTIONS} ruby /src/bin/annotate /junits : echo '<h1>Backend unit tests</h1>'; cat tests/2-tests-1-failure.output; exit 64"
+    "${DOCKER_STUB_DEFAULT_OPTIONS} ruby /src/bin/annotate /junits : echo '<h1>Backend unit tests</h1>'; head -4 tests/2-tests-1-failure.output; echo 'Excluded tests: 1'; tail -n +5 tests/2-tests-1-failure.output; exit 64"
 
   run "$PWD/hooks/command"
 
@@ -273,7 +275,9 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
   assert_output --partial 'Errors: 1'
   assert_output --partial 'Skipped: 0'
   assert_output --partial 'Total tests: 2'
+  assert_output --partial 'Excluded tests: 1'
   assert_output --partial '<summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>'
+  refute_output --partial '<details>'
   refute_output --partial 'First line of failure output'
   refute_output --partial '<pre>'
 
