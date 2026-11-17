@@ -56,6 +56,22 @@ Default: `junit`
 
 The buildkite annotation context to use. Useful to differentiate multiple runs of this plugin in a single pipeline.
 
+### `exclude-tests` (optional, array of strings)
+
+Exclude failure, error, and skipped results for tests whose JUnit testcase `name` contains any of the supplied strings. Matching is case-sensitive and literal: punctuation has no special meaning. Empty strings are not allowed. Omitting this option or supplying an empty array leaves all results included.
+
+```yaml
+exclude-tests:
+  - "checkout with expired card"
+  - "refund during maintenance"
+```
+
+Excluded results are omitted from the detailed lists and the failure, error, and skipped counts. They do not trigger `fail-build-on-error` or error styling. The plugin reports `Excluded tests: N` when it excludes unsuccessful tests, counting each testcase once even if it contains multiple results. Matching passing tests are not counted as excluded.
+
+`Total tests` still includes every testcase, so `min-tests` is unchanged. Slowest-test reporting also includes excluded tests. This option does not change the original test step's exit status or the JUnit artifacts.
+
+Exclusions alone do not force an annotation. Use `always-annotate: true` to display the summary when no non-excluded failures or errors remain. The summary is also printed in the annotation step's job log.
+
 ### `job-uuid-file-pattern` (optional)
 
 Default: `-(.*).xml`

@@ -11,6 +11,11 @@ configuration:
       type: boolean
     context:
       type: string
+    exclude-tests:
+      type: array
+      items:
+        type: string
+        minLength: 1
     failure-format:
       type: string
       enum:

@@ -2,6 +2,66 @@ require 'minitest/autorun'
 require 'open3'
 
 describe "Junit annotate plugin parser" do
+  it "excludes literal substrings from unsuccessful results without changing total tests" do
+    stdout, stderr, status = Open3.capture3(
+      {
+        'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_0' => 'checkout [expired].card',
+        'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_1' => 'refund during',
+        'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED' => 'true'
+      },
+      "#{__dir__}/../bin/annotate", "#{__dir__}/excluded-tests/"
+    )
+
+    assert_equal 64, status.exitstatus, stderr
+    assert_includes stdout, "Failures: 1\nErrors: 1\nSkipped: 1\nTotal tests: 7\nExcluded tests: 3\n"
+    assert_includes stdout, 'Checkout [expired].card'
+    assert_includes stdout, 'checkout expiredXcard'
+    assert_includes stdout, 'keep skipped'
+    refute_includes stdout, 'hidden failure'
+    refute_includes stdout, 'hidden error'
+    refute_includes stdout, 'hidden skip'
+  end
+
+  it "does not signal failure when all unsuccessful tests are excluded" do
+    stdout, stderr, status = Open3.capture3(
+      {
+        'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_0' => 'checkout',
+        'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_1' => 'refund',
+        'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_2' => 'Checkout',
+        'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_3' => 'keep'
+      },
+      "#{__dir__}/../bin/annotate", "#{__dir__}/excluded-tests/"
+    )
+
+    assert_equal 0, status.exitstatus, stderr
+    assert_equal "Failures: 0\nErrors: 0\nSkipped: 0\nTotal tests: 7\nExcluded tests: 6\n", stdout
+  end
+
+  it "keeps excluded tests in slowest-test reporting" do
+    stdout, stderr, status = Open3.capture3(
+      {
+        'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_0' => '[expired].card',
+        'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST' => '1'
+      },
+      "#{__dir__}/../bin/annotate", "#{__dir__}/excluded-tests/"
+    )
+
+    assert_equal 64, status.exitstatus, stderr
+    assert_includes stdout, '<td>checkout [expired].card</td><td>10.0</td>'
+    refute_includes stdout, 'hidden failure'
+  end
+
+  it "rejects empty exclusion keywords" do
+    stdout, stderr, status = Open3.capture3(
+      { 'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_0' => '' },
+      "#{__dir__}/../bin/annotate", "#{__dir__}/excluded-tests/"
+    )
+
+    assert_equal 1, status.exitstatus
+    assert_empty stdout
+    assert_includes stderr, 'exclude-tests entries must not be empty'
+  end
+
   it "handles no failures" do
     stdout, stderr, status = Open3.capture3("#{__dir__}/../bin/annotate", "#{__dir__}/no-test-failures/")
 

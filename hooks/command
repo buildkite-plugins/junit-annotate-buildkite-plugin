@@ -43,6 +43,11 @@ fi
 
 echo "--- :junit: Processing the junits"
 
+exclude_test_env=()
+for name in ${!BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_@}; do
+  exclude_test_env+=(--env "$name=${!name}")
+done
+
 set +e
 if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-true}" =~ "true" ]]; then
   docker \
@@ -55,6 +60,7 @@ if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-true}" =~ "true" ]]; the
       --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT:-}" \
       --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST:-}" \
       --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED:-}" \
+      ${exclude_test_env[@]+"${exclude_test_env[@]}"} \
       "${RUBY_IMAGE}" ruby /src/bin/annotate /junits \
         > "$annotation_path"
 else

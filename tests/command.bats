@@ -69,9 +69,11 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
   rm "${annotation_input}"
 }
 
-@test "can pass through optional job uuid file pattern" {
+@test "can pass through optional job uuid file pattern and exclusion keywords" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN="custom_(*)_pattern.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_0="checkout with expired card"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_1="refund during maintenance"
 
   stub mktemp \
     "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
@@ -82,7 +84,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
-    "--log-level error run --rm --volume \* --volume \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN='custom_(*)_pattern.xml' --env \* --env \* --env \* \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
+    "--log-level error run --rm --volume \* --volume \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN='custom_(*)_pattern.xml' --env \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_0='checkout with expired card' --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_EXCLUDE_TESTS_1='refund during maintenance' \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
 
   run "$PWD/hooks/command"
 

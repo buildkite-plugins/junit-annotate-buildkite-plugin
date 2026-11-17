@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="exclusions">
+  <testcase name="checkout [expired].card" classname="payments" time="10">
+    <failure message="hidden failure" />
+  </testcase>
+  <testcase name="refund during maintenance" classname="payments" time="2">
+    <error message="hidden error" />
+    <error message="another hidden error" />
+  </testcase>
+  <testcase name="checkout [expired].card skipped" classname="payments" time="0">
+    <skipped message="hidden skip" />
+  </testcase>
+  <testcase name="Checkout [expired].card" classname="payments" time="1">
+    <failure message="visible failure" />
+  </testcase>
+  <testcase name="checkout expiredXcard" classname="payments" time="1">
+    <error message="visible error" />
+  </testcase>
+  <testcase name="keep skipped" classname="payments" time="0">
+    <skipped message="visible skip" />
+  </testcase>
+  <testcase name="checkout [expired].card passed" classname="payments" time="1" />
+</testsuite>
