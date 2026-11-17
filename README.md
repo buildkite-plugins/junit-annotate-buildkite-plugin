@@ -18,7 +18,7 @@ steps:
           artifacts: tmp/junit-*.xml
 ```
 
-For scenarios where you have different artifact paths that you want to add as annotation then call the plugin multiple times in the pipeline with different contexts as shown below:
+To create separate annotations for different test suites, call the plugin multiple times with different contexts:
 
 ```yml
 steps:
@@ -55,6 +55,20 @@ Forces the creation of the annotation even when no failures or errors are found
 Default: `junit`
 
 The buildkite annotation context to use. Useful to differentiate multiple runs of this plugin in a single pipeline.
+
+### `title` (optional, string)
+
+Adds a heading before the test summary. The title is displayed as literal text, not HTML or Markdown. No heading is added when the title is unset or empty; the context is not used as a default title.
+
+This option is unreleased and is not available in `v2.7.0`. With a version containing this option, configure each plugin invocation with a distinct context and title, for example:
+
+```yaml
+artifacts: tmp/junit-*.xml
+context: unit-tests
+title: Unit test results
+```
+
+A title does not force an annotation to be created or change its context. Use distinct contexts for separate annotations. Titles are retained when oversized reports are simplified, but the replacement notice created by `add-error-annotation` remains generic.
 
 ### `job-uuid-file-pattern` (optional)
 

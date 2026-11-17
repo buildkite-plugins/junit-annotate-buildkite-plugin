@@ -12,7 +12,7 @@ export artifacts_tmp="tests/tmp/junit-artifacts"
 export annotation_tmp="tests/tmp/junit-annotation"
 export annotation_input="tests/tmp/annotation.input"
 
-DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* --env \* \*'
+DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* --env \* --env \* \*'
 
 @test "runs the annotator and creates the annotation" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
@@ -82,7 +82,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
-    "--log-level error run --rm --volume \* --volume \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN='custom_(*)_pattern.xml' --env \* --env \* --env \* \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
+    "--log-level error run --rm --volume \* --volume \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_JOB_UUID_FILE_PATTERN='custom_(*)_pattern.xml' --env \* --env \* --env \* --env \* \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
 
   run "$PWD/hooks/command"
 
@@ -109,13 +109,41 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
-    "--log-level error run --rm --volume \* --volume \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT='file' --env \* --env \* \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
+    "--log-level error run --rm --volume \* --volume \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT='file' --env \* --env \* --env \* \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
 
   run "$PWD/hooks/command"
 
   assert_success
 
   assert_output --partial "Annotation added"
+
+  unstub mktemp
+  unstub buildkite-agent
+  unstub docker
+  rm "${annotation_input}"
+}
+
+@test "can pass through a title" {
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE="Backend <unit> & integration"
+
+  stub mktemp \
+    "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
+    "-d \* : mkdir -p '$annotation_tmp'; echo '$annotation_tmp'"
+
+  stub buildkite-agent \
+    "artifact download \* \* : echo Downloaded artifact \$3 to \$4" \
+    "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
+
+  stub docker \
+    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE='Backend <unit> & integration' \* ruby /src/bin/annotate /junits : echo '<h1>Backend &lt;unit&gt; &amp; integration</h1>'; cat tests/2-tests-1-failure.output; exit 64"
+
+  run "$PWD/hooks/command"
+
+  assert_success
+  assert_output --partial "Annotation added with context junit and style error"
+  run head -1 "${annotation_input}"
+  assert_output '<h1>Backend &lt;unit&gt; &amp; integration</h1>'
 
   unstub mktemp
   unstub buildkite-agent
@@ -215,6 +243,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
 @test "creates summary annotation if original is larger than MAX_SIZE" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MAX_SIZE="100"
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE="Backend unit tests"
 
   stub mktemp \
     "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
@@ -230,7 +259,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
-    "${DOCKER_STUB_DEFAULT_OPTIONS} ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
+    "${DOCKER_STUB_DEFAULT_OPTIONS} ruby /src/bin/annotate /junits : echo '<h1>Backend unit tests</h1>'; cat tests/2-tests-1-failure.output; exit 64"
 
   run "$PWD/hooks/command"
 
@@ -238,7 +267,15 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
 
   assert_output --partial "Failures too large to annotate"
   assert_output --partial "using a simplified annotation"
-  assert_equal "6 ${annotation_input}" "$(wc -l "${annotation_input}" | cut -f 1)"
+  run cat "${annotation_input}"
+  assert_output --partial '<h1>Backend unit tests</h1>'
+  assert_output --partial 'Failures: 0'
+  assert_output --partial 'Errors: 1'
+  assert_output --partial 'Skipped: 0'
+  assert_output --partial 'Total tests: 2'
+  assert_output --partial '<summary><code>Account#maximum_jobs_added_by_pipeline_changer returns 250 by default in spec.models.account_spec</code></summary>'
+  refute_output --partial 'First line of failure output'
+  refute_output --partial '<pre>'
 
   unstub docker
   unstub du
@@ -373,6 +410,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
 @test "creates annotation with no failures but min tests triggers" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MIN_TESTS=1
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE="Total tests: backend"
 
   stub mktemp \
     "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
@@ -383,14 +421,16 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
-    "${DOCKER_STUB_DEFAULT_OPTIONS} ruby /src/bin/annotate /junits : echo 'Total tests: 0'"
+    "${DOCKER_STUB_DEFAULT_OPTIONS} ruby /src/bin/annotate /junits : printf '%s\n' '<h1>Total tests: backend</h1>' 'Failures: 0' 'Errors: 0' 'Skipped: 0' 'Total tests: 0'"
 
   run "$PWD/hooks/command"
 
   assert_failure
   assert_output --partial "Total tests: 0"
   assert_output --partial "Less than 1 tests analyzed"
-  assert_equal "$(cat "${annotation_input}")" 'Total tests: 0'
+  run cat "${annotation_input}"
+  assert_output --partial '<h1>Total tests: backend</h1>'
+  assert_output --partial 'Total tests: 0'
 
   unstub mktemp
   unstub buildkite-agent
@@ -400,6 +440,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
 @test "no failures and min-tests ok does not create annotation" {
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS="junits/*.xml"
   export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_MIN_TESTS=12
+  export BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE="Total tests: backend"
 
   stub mktemp \
     "-d \* : mkdir -p '$artifacts_tmp'; echo '$artifacts_tmp'" \
@@ -409,7 +450,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "artifact download \* \* : echo Downloaded artifact \$3 to \$4"
 
   stub docker \
-    "${DOCKER_STUB_DEFAULT_OPTIONS} ruby /src/bin/annotate /junits : echo 'Total tests: 100'"
+    "${DOCKER_STUB_DEFAULT_OPTIONS} ruby /src/bin/annotate /junits : printf '%s\n' '<h1>Total tests: backend</h1>' 'Failures: 0' 'Errors: 0' 'Skipped: 0' 'Total tests: 100'"
 
   run "$PWD/hooks/command"
 
@@ -460,7 +501,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
-    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* --env \* ruby:special ruby /src/bin/annotate /junits : echo '<details>Failure</details>' && exit 64"
+    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* --env \* --env \* ruby:special ruby /src/bin/annotate /junits : echo '<details>Failure</details>' && exit 64"
 
   run "$PWD/hooks/command"
 
@@ -488,7 +529,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
-    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED='true' \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
+    "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED='true' --env \* \* ruby /src/bin/annotate /junits : cat tests/2-tests-1-failure.output && exit 64"
 
   run "$PWD/hooks/command"
 
@@ -515,7 +556,7 @@ DOCKER_STUB_DEFAULT_OPTIONS='--log-level error run --rm --volume \* --volume \* 
     "annotate --context \* --style \* : cat >'${annotation_input}'; echo Annotation added with context \$3 and style \$5, content saved"
 
   stub docker \
-     "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=5 --env \* \* ruby /src/bin/annotate /junits : cat tests/2-slowest-tests.output"
+     "--log-level error run --rm --volume \* --volume \* --env \* --env \* --env BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=5 --env \* --env \* \* ruby /src/bin/annotate /junits : cat tests/2-slowest-tests.output"
 
   run "$PWD/hooks/command"
 

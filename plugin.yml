@@ -38,6 +38,8 @@ configuration:
       type: boolean
     style:
       type: string
+    title:
+      type: string
   required:
     - artifacts
   additionalProperties: false

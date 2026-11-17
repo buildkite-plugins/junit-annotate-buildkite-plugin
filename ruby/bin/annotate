@@ -19,6 +19,7 @@ failure_format = 'classname' if !failure_format || failure_format.empty?
 
 report_slowest = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST'].to_i
 report_skipped = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED'] == 'true'
+title = ENV['BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE'].to_s
 
 class Failure < Struct.new(:name, :unit_name, :body, :job, :message)
 end
@@ -77,6 +78,8 @@ end
 
 STDERR.puts "--- ✍️ Preparing annotation"
 
+# Keep the heading on one line so the hook's five-line summary includes all counts.
+puts "<h1>#{CGI.escapeHTML(title).gsub("\r", '&#13;').gsub("\n", '&#10;')}</h1>" unless title.empty?
 puts "Failures: #{tests[:failure].length}"
 puts "Errors: #{tests[:error].length}"
 puts "Skipped: #{tests[:skipped].length}"
