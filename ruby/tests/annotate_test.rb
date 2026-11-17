@@ -82,6 +82,38 @@ describe "Junit annotate plugin parser" do
     assert_equal 0, status.exitstatus
   end
 
+  it "adds an escaped title before the summary without changing failures" do
+    stdout, _stderr, status = Open3.capture3(
+      { 'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE' => "Backend <unit> & \"integration\"\r\nTotal tests: 999" },
+      "#{__dir__}/../bin/annotate", "#{__dir__}/two-test-failures/"
+    )
+
+    assert_equal <<~OUTPUT, stdout.lines.first(5).join
+      <h1>Backend &lt;unit&gt; &amp; &quot;integration&quot;&#13;&#10;Total tests: 999</h1>
+      Failures: 4
+      Errors: 0
+      Skipped: 0
+      Total tests: 6
+    OUTPUT
+    assert_includes stdout, '<details>'
+    assert_equal 64, status.exitstatus
+  end
+
+  it "does not add a heading for an empty title" do
+    stdout, _stderr, status = Open3.capture3(
+      { 'BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE' => '' },
+      "#{__dir__}/../bin/annotate", "#{__dir__}/no-test-failures/"
+    )
+
+    assert_equal <<~OUTPUT, stdout
+      Failures: 0
+      Errors: 0
+      Skipped: 0
+      Total tests: 8
+    OUTPUT
+    assert_equal 0, status.exitstatus
+  end
+
   it "handles failures across multiple files" do
     stdout, stderr, status = Open3.capture3("#{__dir__}/../bin/annotate", "#{__dir__}/two-test-failures/")
 

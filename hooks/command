@@ -37,7 +37,7 @@ trap cleanup EXIT
 
 echo "--- :junit: Download the junits"
 if ! buildkite-agent artifact download "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_ARTIFACTS}" "$artifacts_dir"; then
-  echo "--- :boom: Could not download artifacts"
+  echo "^^^ +++ :boom: Could not download artifacts"
   exit "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILED_DOWNLOAD_EXIT_CODE:-2}"
 fi
 
@@ -60,6 +60,7 @@ if [[ "${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_RUN_IN_DOCKER:-true}" =~ "true" ]]; the
       --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_FAILURE_FORMAT:-}" \
       --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SLOWEST:-}" \
       --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_REPORT_SKIPPED:-}" \
+      --env "BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE=${BUILDKITE_PLUGIN_JUNIT_ANNOTATE_TITLE:-}" \
       ${exclude_test_env[@]+"${exclude_test_env[@]}"} \
       "${RUBY_IMAGE}" ruby /src/bin/annotate /junits \
         > "$annotation_path"
@@ -99,7 +100,7 @@ if [ $has_errors -eq 0 ]; then
   fi
 
   if [[ -e "${annotation_path}" ]]; then
-    TOTAL_TESTS=$(head -5 "${annotation_path}" | grep 'Total tests' | cut -d\  -f3)
+    TOTAL_TESTS=$(head -5 "${annotation_path}" | grep '^Total tests: ' | cut -d\  -f3)
   else
     TOTAL_TESTS=0
   fi
@@ -122,7 +123,7 @@ elif ! check_size; then
   else
     # creating a simplified version of the annotation
     mv "${annotation_path}" "${annotation_path}2"
-    head -5 "${annotation_path}2" >"${annotation_path}"
+    sed -n '/^<details>$/q;p' "${annotation_path}2" >"${annotation_path}"
     # || true is to avoid issues if no summary is found
     grep '<summary>' "${annotation_path}2" >>"${annotation_path}" || true
 
