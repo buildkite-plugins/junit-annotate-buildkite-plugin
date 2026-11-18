@@ -14,7 +14,7 @@ steps:
   - wait: ~
     continue_on_failure: true
   - plugins:
-      - junit-annotate#v2.7.0:
+      - junit-annotate#v3.0.0:
           artifacts: tmp/junit-*.xml
 ```
 
@@ -30,10 +30,10 @@ steps:
   - wait: ~
     continue_on_failure: true
   - plugins:
-      - junit-annotate#v2.7.0:
+      - junit-annotate#v3.0.0:
           artifacts: tmp/junit-*.xml
   - plugins:
-      - junit-annotate#v2.7.0:
+      - junit-annotate#v3.0.0:
           artifacts: artifacts/junit-*.xml
           context: junit-artifacts
 ```
@@ -76,7 +76,7 @@ Exclusions alone do not force an annotation. Use `always-annotate: true` to disp
 
 Adds a heading before the test summary. The title is displayed as literal text, not HTML or Markdown. No heading is added when the title is unset or empty; the context is not used as a default title.
 
-This option is unreleased and is not available in `v2.7.0`. With a version containing this option, configure each plugin invocation with a distinct context and title, for example:
+Configure each plugin invocation with a distinct context and title, for example:
 
 ```yaml
 artifacts: tmp/junit-*.xml
@@ -200,7 +200,7 @@ To test your plugin in your builds prior to opening a pull request, you can refe
 steps:
   - label: Annotate
     plugins:
-      - YourGithubHandle/junit-annotate#v2.7.0:
+      - YourGithubHandle/junit-annotate#v3.0.0:
           ...
 ```
 
